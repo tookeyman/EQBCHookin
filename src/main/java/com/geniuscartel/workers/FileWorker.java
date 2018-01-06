@@ -32,9 +32,10 @@ public class FileWorker {
         try(FileReader fr = new FileReader(f);
             BufferedReader br = new BufferedReader(fr)
         ){
-            br.lines().filter(line->lookingFor.reset(line).find())
+            br.lines()
+                    .filter(line -> lookingFor.reset(line).find())
                     .collect(Collectors.toList())
-                    .forEach(y-> System.out.println("Found reference in " + f.getAbsolutePath()));
+                    .forEach(y -> System.out.println("Found reference in " + f.getAbsolutePath()));
         } catch (IOException e) {
             e.printStackTrace();
         }

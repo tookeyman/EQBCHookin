@@ -58,7 +58,6 @@ public class AsyncRequestInterop {
 
     private int assignRequestNumber(){
         if(requests.size() == 0) return 0;
-
         return IntStream.iterate(0, i -> i + 1).limit(requests.size()+1).filter(isInUse).findFirst().getAsInt();
     }
 

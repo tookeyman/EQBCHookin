@@ -20,7 +20,7 @@ public class EQBCClient {
 
     private RequestWorker<String> requestWorker;
     private OutputWorker outputWorker;
-    AsyncRequestInterop async;
+    private AsyncRequestInterop async;
 
     private ExecutorService IO_THREADS = Executors.newCachedThreadPool();
 
@@ -30,7 +30,7 @@ public class EQBCClient {
             this.socketOut = s.getOutputStream();
             this.socketIn = new BufferedReader(new InputStreamReader(s.getInputStream()));
         } catch (IOException e) {
-            System.out.println("Could not establish socket...");
+            System.out.println("Could not create socket...");
         }
         requestWorker = new RequestWorker<>();
         outputWorker = new OutputWorker(socketOut);
@@ -45,7 +45,9 @@ public class EQBCClient {
         IO_THREADS.execute(outputWorker);
     }
 
+
     public void shutDownWorkers(){
+        //todo create a mechanism for shutting down the orchestrator from a character
         outputWorker.setRunning(false);
         requestWorker.setRunning(false);
         outputWorker.notifyQue();
@@ -81,8 +83,8 @@ public class EQBCClient {
 
     private Runnable testMessages() {
         return () -> {
-            Future f = async.submitRequest("Zomgharmtouch", "${Me.ID}");
             try {
+                Future f = async.submitRequest("Zomgharmtouch", "${Me.ID}");
                 System.out.println(f.get());
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
