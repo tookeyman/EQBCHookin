@@ -1,7 +1,5 @@
 package com.geniuscartel.workers;
 
-import com.geniuscartel.Toon.Toon;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,7 +64,7 @@ public class RequestWorker<T> extends DequeWorker {
             if(characters.exists(charName)){
                 characters.get(charName).updateState(updateList);
             }else{
-                characters.create(charName, new Toon(charName,updateList));
+                characters.create(charName, updateList);
             }
         }
     }

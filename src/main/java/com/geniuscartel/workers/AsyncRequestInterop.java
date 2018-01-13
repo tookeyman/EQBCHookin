@@ -23,6 +23,7 @@ public class AsyncRequestInterop {
         resultMap.put(reference, value);
         pending = requests.get(reference);
         synchronized (pending){
+            System.out.println("got: " + value + " notifying...");
             pending.notify();
         }
     }
@@ -45,6 +46,10 @@ public class AsyncRequestInterop {
             }
         }
         return null;
+    }
+
+    public void oneWayCommand(String character, String command){
+        output.sendCommandTo(character, command);
     }
 
     public Future submitRequest(String character, String command){

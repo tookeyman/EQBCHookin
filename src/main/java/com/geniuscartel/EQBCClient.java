@@ -22,8 +22,9 @@ public class EQBCClient {
     private RequestWorker<String> requestWorker;
     private OutputWorker outputWorker;
     private AsyncRequestInterop async;
-    private ExecutorService IO_THREADS = Executors.newCachedThreadPool();
-    private CharacterManager characters = new CharacterManager(IO_THREADS);
+
+    private final static ExecutorService IO_THREADS = Executors.newCachedThreadPool();
+    private CharacterManager characters;
 
     public EQBCClient() {
         try {
@@ -33,17 +34,23 @@ public class EQBCClient {
         } catch (IOException e) {
             System.out.println("Could not create socket...");
         }
-        requestWorker = new RequestWorker<>(characters);
         outputWorker = new OutputWorker(socketOut);
+
+
         async = new AsyncRequestInterop(IO_THREADS, outputWorker);
 
+
+        characters = new CharacterManager(IO_THREADS, async);
+
+        requestWorker = new RequestWorker<>(characters);
         requestWorker.setOutputWorker(outputWorker);
+        requestWorker.setAsync(async);
         outputWorker.setRequestWorker(requestWorker);
 
-        requestWorker.setAsync(async);
-
-        IO_THREADS.execute(requestWorker);
         IO_THREADS.execute(outputWorker);
+        IO_THREADS.execute(requestWorker);
+
+
     }
 
 
