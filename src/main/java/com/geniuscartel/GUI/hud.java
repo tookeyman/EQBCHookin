@@ -2,7 +2,7 @@ package com.geniuscartel.GUI;
 
 import com.geniuscartel.EQBCClient;
 
-public class HUD {
+public class hud {
 
     private EQBCClient client;
 

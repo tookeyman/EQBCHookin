@@ -16,10 +16,11 @@ public class GUI_Entry extends Application{
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
         this.client = new EQBCClient();
-
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("HUD.fxml"));
+        String hudResourceName = "com/geniuscartel/GUI/hud.fxml";
+        System.out.println("Resource path: " + hudResourceName);
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource(hudResourceName));
         Parent root = fxmlLoader.load();
-        HUD controller = fxmlLoader.getController();
+        hud controller = fxmlLoader.getController();
 
         Scene mainStage = new Scene(root, 500, 500);
         primaryStage.setScene(mainStage);

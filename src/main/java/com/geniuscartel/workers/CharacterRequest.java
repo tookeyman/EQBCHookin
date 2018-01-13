@@ -6,7 +6,7 @@ import java.util.concurrent.Callable;
 public class CharacterRequest implements Callable{
     private final int id;
     private String requestedValue;
-    private HashMap<Integer, String> resultMap;
+    private final HashMap<Integer, String> resultMap;
     AsyncRequestInterop watcher;
 
     public CharacterRequest(int id, HashMap<Integer, String> resultMap, AsyncRequestInterop watcher) {

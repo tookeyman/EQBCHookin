@@ -1,6 +1,7 @@
 package com.geniuscartel;
 
 import com.geniuscartel.workers.AsyncRequestInterop;
+import com.geniuscartel.workers.CharacterManager;
 import com.geniuscartel.workers.OutputWorker;
 import com.geniuscartel.workers.RequestWorker;
 
@@ -21,8 +22,8 @@ public class EQBCClient {
     private RequestWorker<String> requestWorker;
     private OutputWorker outputWorker;
     private AsyncRequestInterop async;
-
     private ExecutorService IO_THREADS = Executors.newCachedThreadPool();
+    private CharacterManager characters = new CharacterManager(IO_THREADS);
 
     public EQBCClient() {
         try {
@@ -32,7 +33,7 @@ public class EQBCClient {
         } catch (IOException e) {
             System.out.println("Could not create socket...");
         }
-        requestWorker = new RequestWorker<>();
+        requestWorker = new RequestWorker<>(characters);
         outputWorker = new OutputWorker(socketOut);
         async = new AsyncRequestInterop(IO_THREADS, outputWorker);
 
@@ -67,10 +68,14 @@ public class EQBCClient {
         boolean triggered = false;
         while (running) {
             String currentRequest = null;
+
+
             if(!triggered){
-                IO_THREADS.execute(testMessages());
+
                 triggered = true;
             }
+
+
             try {
                 currentRequest = socketIn.readLine();
                 requestWorker.addToQue(currentRequest);

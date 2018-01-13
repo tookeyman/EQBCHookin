@@ -1,5 +1,7 @@
 package com.geniuscartel.workers;
 
+import com.geniuscartel.Toon.Toon;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +14,12 @@ public class RequestWorker<T> extends DequeWorker {
     private OutputWorker outputWorker;
     private List<String> clientNames = new ArrayList<>();
     private AsyncRequestInterop async;
+    private CharacterManager characters;
+    private boolean verbose = false;
+
+    public RequestWorker(CharacterManager characters) {
+        this.characters = characters;
+    }
 
     public void setOutputWorker(OutputWorker out){
         this.outputWorker = out;
@@ -27,7 +35,9 @@ public class RequestWorker<T> extends DequeWorker {
     }
 
     private void handleRequest(String request){
-        if(isNetbotPacket(request)) return;
+        if(isNetbotPacket(request)){
+            processNetbotPacket(request);
+        }
         if(isPing(request)) {
             outputWorker.pong();
             return;
@@ -37,20 +47,33 @@ public class RequestWorker<T> extends DequeWorker {
             System.out.println("Updated Client names: " + clientNames);
             return;
         }
-        if(isAsyncRequest(request)){
+        if (isAsyncRequest(request)) {
             System.out.println("Recognized async response");
             async.handleReturnedRequest(request);
         }
-        System.out.printf("[REQUEST]%s\r\n", request);
+        if (verbose) System.out.printf("[REQUEST]%s\r\n", request);
     }
 
     public List<String> getClientNames() {
         return clientNames;
     }
 
+    private void processNetbotPacket(String request){
+        Matcher packetGrabber = Pattern.compile("^\tNBPKT:(\\w+):\\[NB]\\|(.*)\\[NB]$").matcher(request);
+        if(packetGrabber.find()){
+            String charName = packetGrabber.group(1);
+            String updateList[] = packetGrabber.group(2).split("\\|");
+            if(characters.exists(charName)){
+                characters.get(charName).updateState(updateList);
+            }else{
+                characters.create(charName, new Toon(charName,updateList));
+            }
+        }
+    }
+
     private boolean isAsyncRequest(String request){
         if(!request.substring(0, 1).equals("[")) return false;
-        Matcher asyncPattern = Pattern.compile("^\\[\\w+\\] ASYNC:\\d+::.*$").matcher(request);
+        Matcher asyncPattern = Pattern.compile("^\\[\\w+] ASYNC:\\d+::.*$").matcher(request);
         return asyncPattern.find();
     }
 
