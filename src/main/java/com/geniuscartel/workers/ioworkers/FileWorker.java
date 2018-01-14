@@ -8,6 +8,7 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -26,6 +27,18 @@ public class FileWorker {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static File searchForFile(Path startingPoint, String fileName) throws IOException {
+        return Files.walk(startingPoint, FileVisitOption.FOLLOW_LINKS)
+            .filter(matchesFileName(fileName))
+            .findAny()
+            .map(Path::toFile)
+            .orElse(null);
+    }
+
+    private static Predicate<Path> matchesFileName(String fileName){
+        return (x) -> x.toFile().getName().matches(fileName);
     }
 
     private Consumer<File> sniffForPattern = (f) -> {

@@ -1,20 +1,28 @@
-package com.geniuscartel.Toon.classes;
+package com.geniuscartel.characters.classes;
 
-import com.geniuscartel.Toon.Stats;
+import com.geniuscartel.characters.CharacterState;
+import com.geniuscartel.characters.Stats;
 import com.geniuscartel.workers.characterworkers.CharacterManager;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.stream.IntStream;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 public abstract class Character implements Runnable{
-    private int[] buffs;
+    private List<Integer> buffs;
     private Stats stats;
     private int casting = 0, id =-1;
     private final String name;
     private boolean running = true;
     private CharacterManager boss;
+    private List<Integer> neededBuffs;
+    private List<Integer> selfBuffs;
+    private CharacterState STATE;
 
-    public int[] getBuffs() {
+    public List<Integer> getBuffs() {
         return buffs;
     }
 
@@ -46,11 +54,23 @@ public abstract class Character implements Runnable{
         boss.submitCommand(character, command);
     }
 
+    public CharacterState getSTATE() {
+        return STATE;
+    }
+
+    public void setSTATE(CharacterState STATE) {
+        //todo action cleanup between state changes
+        this.STATE = STATE;
+        this.notify();
+    }
+
     public Character(String name, String[] NBPacket, CharacterManager boss) {
         this.name = name;
         this.stats = new Stats();
         this.boss = boss;
         updateState(NBPacket);
+        neededBuffs = populateNeededBuffs();
+        selfBuffs = populateSelfBuffs();
     }
 
     public synchronized void updateState(String[] updateParameters) {
@@ -140,16 +160,13 @@ public abstract class Character implements Runnable{
     private void updateBuffs(String update) {
         String[] couplet = update.split("=");
         if (couplet.length == 1) {
-            buffs = new int[0];
+            buffs = new ArrayList<>();
         }else{
-            String[] stringbuffs = couplet[1].split(":");
-            int nbuff = stringbuffs.length;
-            buffs = new int[nbuff];
-            IntStream.iterate(0, i->i+1).limit(nbuff)
-                .boxed().forEach(x->buffs[x] = Integer.parseInt(stringbuffs[x]));
+            buffs = Arrays.stream(couplet[1].split(":"))
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
         }
     }
-
 
     private void updateCasting(String update) {
         String[] couplet = update.split("=");
@@ -160,16 +177,86 @@ public abstract class Character implements Runnable{
         }
     }
 
+    public String queryForInfo(String query){
+        String answer = "";
+        Future<String> result = boss.getAsync().submitRequest(name, query);
+        while(!result.isDone()) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            answer = result.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return answer;
+    }
+
+    public void cast(int spellID){
+        boss.submitCommand(name, String.format("//casting %d", spellID));
+        try {
+            while (casting == -1) {
+                this.wait();
+            }
+            while(casting == spellID) {
+                this.wait();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private List<Integer> populateNeededBuffs(){
+        String buffs = "9184|9211";
+        return Arrays.stream(buffs.split("\\|")).map(Integer::parseInt).collect(Collectors.toList());
+    }
+
+    private List<Integer> populateSelfBuffs(){
+        String selfBuffs = "9011|5327";
+        return Arrays.stream(selfBuffs.split("\\|")).map(Integer::parseInt).collect(Collectors.toList());
+    }
+
+    public List<Integer> getNeededBuffs() {
+        return neededBuffs;
+    }
+
+    public List<Integer> getSelfBuffs() {
+        return selfBuffs;
+    }
+
+    @Override
+    public void run(){
+        while (running) {
+            switch (STATE) {
+                case REST:
+                    restStateAction();
+                    break;
+                case COMBAT:
+                    combatStateAction();
+                    break;
+                case FOLLOWING:
+                    followStateAction();
+                    break;
+            }
+        }
+    }
 
     @Override
     public String toString() {
         return "Character{" +
-            "buffs=" + Arrays.toString(buffs) +
+            "buffs=" + buffs +
             ", stats=" + stats +
             ", casting=" + casting +
             ", id=" + id +
             ", name='" + name + '\'' +
             '}';
     }
+
+    abstract void restStateAction();
+    abstract void followStateAction();
+    abstract void combatStateAction();
 
 }

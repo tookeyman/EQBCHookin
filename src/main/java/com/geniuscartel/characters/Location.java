@@ -1,4 +1,4 @@
-package com.geniuscartel.Toon;
+package com.geniuscartel.characters;
 
 public class Location {
     float x, y, z;

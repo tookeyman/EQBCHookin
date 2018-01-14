@@ -1,4 +1,4 @@
-package com.geniuscartel.Toon;
+package com.geniuscartel.characters;
 
 public class Stats {
     private int hp = 0, mana = 0, end = 0, hpmax = 0, endmax = 0, manamax = 0, level = 0, xp = 0;
