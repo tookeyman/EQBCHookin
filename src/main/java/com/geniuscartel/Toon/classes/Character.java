@@ -1,17 +1,38 @@
-package com.geniuscartel.Toon;
+package com.geniuscartel.Toon.classes;
 
+import com.geniuscartel.Toon.Stats;
 import com.geniuscartel.workers.CharacterManager;
 
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
-public abstract class Toon implements Runnable{
+public abstract class Character implements Runnable{
     private int[] buffs;
     private Stats stats;
     private int casting = 0, id =-1;
     private final String name;
     private boolean running = true;
     private CharacterManager boss;
+
+    public int[] getBuffs() {
+        return buffs;
+    }
+
+    public Stats getStats() {
+        return stats;
+    }
+
+    public int getCasting() {
+        return casting;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
 
     public void setRunning(boolean running) {
         this.running = running;
@@ -25,7 +46,7 @@ public abstract class Toon implements Runnable{
         boss.submitCommand(character, command);
     }
 
-    public Toon(String name, String[] NBPacket, CharacterManager boss) {
+    public Character(String name, String[] NBPacket, CharacterManager boss) {
         this.name = name;
         this.stats = new Stats();
         updateState(NBPacket);
@@ -141,7 +162,7 @@ public abstract class Toon implements Runnable{
 
     @Override
     public String toString() {
-        return "Toon{" +
+        return "Character{" +
             "buffs=" + Arrays.toString(buffs) +
             ", stats=" + stats +
             ", casting=" + casting +

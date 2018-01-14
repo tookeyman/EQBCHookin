@@ -1,10 +1,9 @@
 package com.geniuscartel.Toon.classes;
 
 import com.geniuscartel.Toon.ShortClass;
-import com.geniuscartel.Toon.Toon;
 import com.geniuscartel.workers.CharacterManager;
 
-public class ShadowKnight extends Toon {
+public class ShadowKnight extends Character {
     private ShortClass className = ShortClass.SHD;
 
     public ShadowKnight(String name, String[] NBPacket, CharacterManager boss) {
@@ -16,6 +15,7 @@ public class ShadowKnight extends Toon {
         while(isRunning()){
             synchronized (this){
                 try {
+                    super.sendCommand(this.getName(), "//echo hello");
                     wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

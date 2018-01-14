@@ -1,7 +1,7 @@
 package com.geniuscartel.workers;
 
 import com.geniuscartel.Toon.ShortClass;
-import com.geniuscartel.Toon.Toon;
+import com.geniuscartel.Toon.classes.Character;
 import com.geniuscartel.Toon.classes.ShadowKnight;
 
 import java.util.HashMap;
@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 public class CharacterManager {
-    private final HashMap<String, Toon> characters;
+    private final HashMap<String, Character> characters;
     private ExecutorService IO_THREADS;
     private AsyncRequestInterop async;
 
@@ -24,7 +24,7 @@ public class CharacterManager {
         return characters.containsKey(charname);
     }
 
-    public Toon get(String key){
+    public Character get(String key){
         return characters.get(key);
     }
 
@@ -41,7 +41,7 @@ public class CharacterManager {
     private Runnable createNewCharacter(String key, String[] value){
         return ()-> {
             Future className = async.submitRequest(key, "${Me.Class.ShortName}");
-            Toon cha = null;
+            Character cha = null;
             while (!className.isDone()) {
                 try {
                     synchronized (this) {
