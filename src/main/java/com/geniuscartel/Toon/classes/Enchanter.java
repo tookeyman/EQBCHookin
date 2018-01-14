@@ -15,7 +15,6 @@ public class Enchanter extends Character {
         while(isRunning()){
             synchronized (this){
                 try {
-                    super.sendCommand(this.getName(), "//bca hello from enchanter");
                     wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

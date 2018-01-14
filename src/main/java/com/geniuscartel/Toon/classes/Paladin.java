@@ -15,7 +15,6 @@ public class Paladin extends Character {
         while(isRunning()){
             synchronized (this){
                 try {
-                    super.sendCommand(this.getName(), "//bca hello from paladin");
                     wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

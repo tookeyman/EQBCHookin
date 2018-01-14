@@ -15,7 +15,6 @@ public class ShadowKnight extends Character {
         while(isRunning()){
             synchronized (this){
                 try {
-                    super.sendCommand(this.getName(), "//bca hello from shadowknight");
                     wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

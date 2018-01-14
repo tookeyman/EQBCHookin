@@ -15,7 +15,6 @@ public class Beastlord extends Character {
         while(isRunning()){
             synchronized (this){
                 try {
-                    super.sendCommand(this.getName(), "//bca hello from beastlord");
                     wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

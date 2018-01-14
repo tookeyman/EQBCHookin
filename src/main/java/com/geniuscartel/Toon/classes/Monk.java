@@ -15,7 +15,6 @@ public class Monk extends Character {
         while(isRunning()){
             synchronized (this){
                 try {
-                    super.sendCommand(this.getName(), "//bca hello from monk");
                     wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

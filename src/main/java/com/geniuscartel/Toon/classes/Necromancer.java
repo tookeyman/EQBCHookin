@@ -15,7 +15,6 @@ public class Necromancer extends Character {
         while(isRunning()){
             synchronized (this){
                 try {
-                    super.sendCommand(this.getName(), "//bca hello from Necromancer");
                     wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

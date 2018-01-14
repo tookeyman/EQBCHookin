@@ -15,7 +15,6 @@ public class Berserker extends Character {
         while(isRunning()){
             synchronized (this){
                 try {
-                    super.sendCommand(this.getName(), "//bca hello from berserker");
                     wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
