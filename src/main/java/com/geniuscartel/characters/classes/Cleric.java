@@ -12,28 +12,34 @@ public class Cleric extends Character {
 
     @Override
     void restStateAction() {
-        try {
-            this.wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        synchronized (this) {
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
     void followStateAction() {
-        try {
-            this.wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        synchronized (this) {
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
     void combatStateAction() {
-        try {
-            this.wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        synchronized (this) {
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

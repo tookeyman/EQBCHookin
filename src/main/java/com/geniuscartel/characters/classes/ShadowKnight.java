@@ -15,10 +15,12 @@ public class ShadowKnight extends Character {
 
     @Override
     void restStateAction() {
-        try {
-            this.wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        synchronized (this) {
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

@@ -20,7 +20,7 @@ public abstract class Character implements Runnable{
     private CharacterManager boss;
     private List<Integer> neededBuffs;
     private List<Integer> selfBuffs;
-    private CharacterState STATE;
+    private CharacterState STATE = CharacterState.REST;
 
     public List<Integer> getBuffs() {
         return buffs;
