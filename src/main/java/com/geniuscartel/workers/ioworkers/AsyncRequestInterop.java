@@ -1,4 +1,6 @@
-package com.geniuscartel.workers;
+package com.geniuscartel.workers.ioworkers;
+
+import com.geniuscartel.workers.characterworkers.CharacterRequest;
 
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -22,9 +24,11 @@ public class AsyncRequestInterop {
         CharacterRequest pending;
         resultMap.put(reference, value);
         pending = requests.get(reference);
-        synchronized (pending){
-            System.out.println("got: " + value + " notifying...");
-            pending.notify();
+        if(pending != null) {
+            synchronized (pending) {
+//                System.out.println("[ASYNC]\tRESPONSE: " + reference + ": " + value + "");
+                pending.notify();
+            }
         }
     }
 
@@ -52,18 +56,19 @@ public class AsyncRequestInterop {
         output.sendCommandTo(character, command);
     }
 
-    public Future submitRequest(String character, String command){
+    public Future<String> submitRequest(String character, String command){
         //todo this has to talk to the mq scripts. right now it's fucking awful
         CharacterRequest pendingRequest = new CharacterRequest(assignRequestNumber(), resultMap, this);
         requests.put(pendingRequest.getId(), pendingRequest);
         String constructedCommand = String.format("//bct Orchestrator ASYNC:%d::%s", pendingRequest.getId(), command);
+        System.out.println("[ASYNC]\tIssuing: " + character + " -> " + constructedCommand);
         output.sendCommandTo(character, constructedCommand);
         return threadPool.submit(pendingRequest);
     }
 
     private int assignRequestNumber(){
         if(requests.size() == 0) return 0;
-        return IntStream.iterate(0, i -> i + 1).limit(requests.size()+1).filter(isInUse).findFirst().getAsInt();
+        return IntStream.iterate(0, i -> i + 1).limit(requests.size()+1).filter(isInUse).findFirst().orElse(-1);
     }
 
     public void releaseRequest(int key){

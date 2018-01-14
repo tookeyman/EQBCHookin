@@ -1,4 +1,4 @@
-package com.geniuscartel.workers;
+package com.geniuscartel.workers.ioworkers;
 
 import java.util.ArrayDeque;
 
@@ -37,7 +37,7 @@ public abstract class DequeWorker<T> implements Runnable{
                 doWorkerTask(queue.removeFirst());
             }
         }
-        System.out.println("run over");
+        System.out.println("[THREAD]\tDeque worker finished...");
     }
 
     abstract void doWorkerTask(T item);

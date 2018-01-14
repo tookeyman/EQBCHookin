@@ -1,4 +1,4 @@
-package com.geniuscartel.workers;
+package com.geniuscartel.workers.ioworkers;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,13 +16,13 @@ public class FileWorker {
 
     private Matcher lookingFor;
 
-    public void searchForPattern(Pattern p, Path startingPoint) {
+    public void searchFolderForPattern(Path startingPoint, Pattern p) {
         this.lookingFor = p.matcher("");
         try {
             Files.walk(startingPoint, FileVisitOption.FOLLOW_LINKS)
-                    .filter(path->!path.toFile().isDirectory())
-                    .map(Path::toFile)
-                    .forEach(sniffForPattern);
+                .filter(path -> !path.toFile().isDirectory())
+                .map(Path::toFile)
+                .forEach(sniffForPattern);
         } catch (IOException e) {
             e.printStackTrace();
         }

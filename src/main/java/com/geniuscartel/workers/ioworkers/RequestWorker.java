@@ -1,4 +1,6 @@
-package com.geniuscartel.workers;
+package com.geniuscartel.workers.ioworkers;
+
+import com.geniuscartel.workers.characterworkers.CharacterManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +48,6 @@ public class RequestWorker<T> extends DequeWorker {
             return;
         }
         if (isAsyncRequest(request)) {
-            System.out.println("Recognized async response");
             async.handleReturnedRequest(request);
         }
         if (verbose) System.out.printf("[REQUEST]%s\r\n", request);
@@ -102,7 +103,7 @@ public class RequestWorker<T> extends DequeWorker {
 
     @Override
     public void run(){
-        System.out.println("Starting RequestWorker");
+        System.out.println("[THREAD]\tStarting RequestWorker...");
         super.run();
     }
 }

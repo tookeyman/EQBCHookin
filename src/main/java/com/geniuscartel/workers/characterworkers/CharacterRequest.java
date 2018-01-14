@@ -1,4 +1,6 @@
-package com.geniuscartel.workers;
+package com.geniuscartel.workers.characterworkers;
+
+import com.geniuscartel.workers.ioworkers.AsyncRequestInterop;
 
 import java.util.HashMap;
 import java.util.concurrent.Callable;
@@ -10,7 +12,6 @@ public class CharacterRequest implements Callable{
     AsyncRequestInterop watcher;
 
     public CharacterRequest(int id, HashMap<Integer, String> resultMap, AsyncRequestInterop watcher) {
-        System.out.println("Request created with ID " + id);
         this.id = id;
         this.resultMap = resultMap;
         this.watcher = watcher;

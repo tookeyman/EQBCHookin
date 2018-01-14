@@ -14,8 +14,13 @@ public class Stats {
     public void setMana(String manaString) {
         String[] couplet = manaString.split("=");
         String[] currMax = couplet[1].split("/");
-        mana = Integer.parseInt(currMax[0]);
-        manamax = Integer.parseInt(currMax[1]);
+        if (currMax.length == 1 || currMax.length == 0) {
+            mana = -1;
+            manamax = -1;
+        } else {
+            mana = Integer.parseInt(currMax[0]);
+            manamax = Integer.parseInt(currMax[1]);
+        }
     }
 
     public void setEnd(String endString) {

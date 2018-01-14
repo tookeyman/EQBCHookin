@@ -1,9 +1,9 @@
 package com.geniuscartel;
 
-import com.geniuscartel.workers.AsyncRequestInterop;
-import com.geniuscartel.workers.CharacterManager;
-import com.geniuscartel.workers.OutputWorker;
-import com.geniuscartel.workers.RequestWorker;
+import com.geniuscartel.workers.characterworkers.CharacterManager;
+import com.geniuscartel.workers.ioworkers.AsyncRequestInterop;
+import com.geniuscartel.workers.ioworkers.OutputWorker;
+import com.geniuscartel.workers.ioworkers.RequestWorker;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class EQBCClient {
             this.socketOut = s.getOutputStream();
             this.socketIn = new BufferedReader(new InputStreamReader(s.getInputStream()));
         } catch (IOException e) {
-            System.out.println("Could not create socket...");
+            System.out.println("[CLIENT]\tCould not create socket...");
         }
         outputWorker = new OutputWorker(socketOut);
 
@@ -67,7 +67,7 @@ public class EQBCClient {
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Workers shut down");
+        System.out.println("[CLIENT]\tWorkers shut down");
     }
 
     public void run() {
@@ -87,7 +87,7 @@ public class EQBCClient {
                 currentRequest = socketIn.readLine();
                 requestWorker.addToQue(currentRequest);
             } catch (IOException e) {
-                System.out.println("Tried to pass a fucked up string to request worker: " + currentRequest);
+                System.out.println("[CLIENT]\tTried to pass a fucked up string to request worker: " + currentRequest);
             }
             requestWorker.notifyQue();
         }

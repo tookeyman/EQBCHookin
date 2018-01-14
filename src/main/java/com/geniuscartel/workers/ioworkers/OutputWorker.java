@@ -1,4 +1,6 @@
-package com.geniuscartel.workers;
+package com.geniuscartel.workers.ioworkers;
+
+import com.geniuscartel.workers.ioworkers.packets.MsgType;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -19,7 +21,6 @@ public class OutputWorker extends DequeWorker {
     @Override
     void doWorkerTask(Object item) {
         try {
-            System.out.printf("[RESPONSE]%s", item);
             socketOut.write(((String)item).getBytes());
         } catch (IOException e) {
             e.printStackTrace();
@@ -70,7 +71,7 @@ public class OutputWorker extends DequeWorker {
     }
 
     public void login() {
-        System.out.println("Sending login packet...");
+        System.out.println("[THREAD]\tSending login packet...");
         String login = "LOGIN=Orchestrator;\tLOCALECHO 1\tNBMSGECHO 1\n";
         sendPackets(login);
     }
@@ -88,7 +89,7 @@ public class OutputWorker extends DequeWorker {
 
     @Override
     public void run(){
-        System.out.println("Starting OutputWorker");
+        System.out.println("[THREAD]\tStarting OutputWorker");
         super.run();
     }
 }

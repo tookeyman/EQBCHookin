@@ -1,7 +1,7 @@
 package com.geniuscartel.Toon.classes;
 
 import com.geniuscartel.Toon.Stats;
-import com.geniuscartel.workers.CharacterManager;
+import com.geniuscartel.workers.characterworkers.CharacterManager;
 
 import java.util.Arrays;
 import java.util.stream.IntStream;
@@ -49,6 +49,7 @@ public abstract class Character implements Runnable{
     public Character(String name, String[] NBPacket, CharacterManager boss) {
         this.name = name;
         this.stats = new Stats();
+        this.boss = boss;
         updateState(NBPacket);
     }
 
@@ -131,7 +132,7 @@ public abstract class Character implements Runnable{
 
                 break;
             default:
-                System.out.println("Did not understand" + directive[0]);
+                System.out.println("[CHARACTER]\tDid not understand" + directive[0]);
         }
         this.notify();
     }

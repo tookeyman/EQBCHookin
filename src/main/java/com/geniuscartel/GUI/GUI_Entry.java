@@ -17,7 +17,6 @@ public class GUI_Entry extends Application{
         this.primaryStage = primaryStage;
         this.client = new EQBCClient();
         String hudResourceName = "com/geniuscartel/GUI/hud.fxml";
-        System.out.println("Resource path: " + hudResourceName);
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource(hudResourceName));
         Parent root = fxmlLoader.load();
         hud controller = fxmlLoader.getController();

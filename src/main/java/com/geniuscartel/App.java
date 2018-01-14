@@ -9,4 +9,7 @@ public class App {
         client.shutDownWorkers();
     }
 
+    public static void debug(Object bug){
+        System.out.printf("[DEBUG]\t%s\r\n", bug);
+    }
 }

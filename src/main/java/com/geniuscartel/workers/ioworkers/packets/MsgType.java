@@ -1,4 +1,4 @@
-package com.geniuscartel.workers;
+package com.geniuscartel.workers.ioworkers.packets;
 
 public enum MsgType {
     CMD_DISCONNECT("\tDISCONNECT\n"), //bccmd disconnect

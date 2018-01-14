@@ -3,6 +3,7 @@ package com.geniuscartel.Toon;
 public enum ShortClass {
     BER,
     BRD,
+    BST,
     CLR,
     DRU,
     ENC,
@@ -16,5 +17,4 @@ public enum ShortClass {
     SHM,
     WAR,
     WIZ
-    ;
 }
