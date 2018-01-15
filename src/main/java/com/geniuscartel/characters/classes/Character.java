@@ -61,7 +61,9 @@ public abstract class Character implements Runnable{
     public void setSTATE(CharacterState STATE) {
         //todo action cleanup between state changes
         this.STATE = STATE;
-        this.notify();
+        synchronized (this) {
+            this.notify();
+        }
     }
 
     public Character(String name, String[] NBPacket, CharacterManager boss) {

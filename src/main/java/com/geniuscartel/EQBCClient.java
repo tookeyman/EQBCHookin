@@ -19,7 +19,7 @@ public class EQBCClient {
 
     private boolean running = true;
 
-    private RequestWorker<String> requestWorker;
+    private RequestWorker requestWorker;
     private OutputWorker outputWorker;
     private AsyncRequestInterop async;
 
@@ -42,7 +42,7 @@ public class EQBCClient {
 
         characters = new CharacterManager(IO_THREADS, async);
 
-        requestWorker = new RequestWorker<>(characters);
+        requestWorker = new RequestWorker(characters);
         requestWorker.setOutputWorker(outputWorker);
         requestWorker.setAsync(async);
         outputWorker.setRequestWorker(requestWorker);

@@ -17,6 +17,8 @@ public class ShadowKnight extends Character {
     void restStateAction() {
         synchronized (this) {
             try {
+                checkBuffs();
+                super.sendCommand(getName(), "//echo resting");
                 this.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -26,19 +28,25 @@ public class ShadowKnight extends Character {
 
     @Override
     void followStateAction() {
-        try {
-            this.wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        synchronized (this) {
+            try {
+                super.sendCommand(getName(), "//echo following");
+                this.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
     void combatStateAction() {
-        try {
-            this.wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        synchronized (this) {
+            try {
+                super.sendCommand(getName(), "//echo fighting");
+                this.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

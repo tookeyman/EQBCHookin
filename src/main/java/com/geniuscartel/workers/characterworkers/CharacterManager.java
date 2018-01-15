@@ -1,5 +1,6 @@
 package com.geniuscartel.workers.characterworkers;
 
+import com.geniuscartel.characters.CharacterState;
 import com.geniuscartel.characters.ShortClass;
 import com.geniuscartel.characters.classes.*;
 import com.geniuscartel.characters.classes.Character;
@@ -9,6 +10,8 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CharacterManager {
     private final HashMap<String, Character> characters;
@@ -19,6 +22,10 @@ public class CharacterManager {
         this.IO_THREADS = IOTHREADS;
         this.async = async;
         characters = new HashMap<>();
+    }
+
+    public void setGlobalState(CharacterState cs){
+        characters.entrySet().stream().forEach(x->x.getValue().setSTATE(cs));
     }
 
     public boolean exists(String charname){
@@ -36,7 +43,24 @@ public class CharacterManager {
     public AsyncRequestInterop getAsync() {
         return async;
     }
+    public void submitRequest(String request) {
+        Matcher managerRequest = Pattern.compile("^\\[\\w+] MANAGER: (.*)$").matcher(request);
+        if(managerRequest.find()){
+            String command = managerRequest.group(1);
+            processRequest(command);
+        }
+    }
 
+    private void processRequest(String command){
+        String[] comSplit = command.split("\\s");
+        if (comSplit.length == 1) {
+            return;
+        }
+        switch(comSplit[0]){
+            case "STATE":
+                setGlobalState(CharacterState.valueOf(comSplit[1]));
+        }
+    }
     public void create(String key, String[] value){
         IO_THREADS.execute(createNewCharacter(key, value));
     }

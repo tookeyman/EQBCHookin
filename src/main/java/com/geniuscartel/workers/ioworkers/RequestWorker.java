@@ -1,5 +1,6 @@
 package com.geniuscartel.workers.ioworkers;
 
+import com.geniuscartel.App;
 import com.geniuscartel.workers.characterworkers.CharacterManager;
 
 import java.util.ArrayList;
@@ -10,12 +11,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class RequestWorker<T> extends DequeWorker {
+public class RequestWorker extends DequeWorker {
     private OutputWorker outputWorker;
     private List<String> clientNames = new ArrayList<>();
     private AsyncRequestInterop async;
     private CharacterManager characters;
-    private boolean verbose = false;
+
 
     public RequestWorker(CharacterManager characters) {
         this.characters = characters;
@@ -34,6 +35,8 @@ public class RequestWorker<T> extends DequeWorker {
         handleRequest((String)item);
     }
 
+
+
     private void handleRequest(String request){
         if(isNetbotPacket(request)){
             processNetbotPacket(request);
@@ -50,7 +53,10 @@ public class RequestWorker<T> extends DequeWorker {
         if (isAsyncRequest(request)) {
             async.handleReturnedRequest(request);
         }
-        if (verbose) System.out.printf("[REQUEST]%s\r\n", request);
+        if(isCharacterManagerRequest(request)){
+            characters.submitRequest(request);
+        }
+        if (App.verbose) System.out.printf("[REQUEST]%s\r\n", request);
     }
 
     public List<String> getClientNames() {
@@ -95,6 +101,11 @@ public class RequestWorker<T> extends DequeWorker {
             return false;
         String header = packet.substring(0, 7);
         return header.equals("\tNBPKT:");
+    }
+
+    private boolean isCharacterManagerRequest(String request){
+        Matcher managerRequest = Pattern.compile("^\\[\\w+] MANAGER:.*$").matcher(request);
+        return managerRequest.find();
     }
 
     private boolean isPing(String packet){
