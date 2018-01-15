@@ -1,14 +1,17 @@
 package com.geniuscartel.characters.classes;
 
+import com.geniuscartel.characters.ActionRequest;
 import com.geniuscartel.characters.CharacterState;
 import com.geniuscartel.characters.Stats;
 import com.geniuscartel.workers.characterworkers.CharacterManager;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public abstract class Character implements Runnable{
@@ -21,9 +24,14 @@ public abstract class Character implements Runnable{
     private List<Integer> neededBuffs;
     private List<Integer> selfBuffs;
     private CharacterState STATE = CharacterState.REST;
+    private final ArrayDeque<ActionRequest> actionQueue = new ArrayDeque<>();
 
     public List<Integer> getBuffs() {
         return buffs;
+    }
+
+    public void submitAction(ActionRequest request) {
+        this.actionQueue.add(request);
     }
 
     public Stats getStats() {
@@ -70,12 +78,12 @@ public abstract class Character implements Runnable{
         this.name = name;
         this.stats = new Stats();
         this.boss = boss;
-        updateState(NBPacket);
+        updateStats(NBPacket);
         neededBuffs = populateNeededBuffs();
         selfBuffs = populateSelfBuffs();
     }
 
-    public synchronized void updateState(String[] updateParameters) {
+    public synchronized void updateStats(String[] updateParameters) {
         Arrays.stream(updateParameters).forEach(this::parseUpdate);
     }
 
@@ -221,6 +229,7 @@ public abstract class Character implements Runnable{
         return Arrays.stream(selfBuffs.split("\\|")).map(Integer::parseInt).collect(Collectors.toList());
     }
 
+
     public List<Integer> getNeededBuffs() {
         return neededBuffs;
     }
@@ -232,8 +241,10 @@ public abstract class Character implements Runnable{
     @Override
     public void run(){
         while (running) {
+            processActionQueue();
             switch (STATE) {
                 case REST:
+                    checkBuffs();
                     restStateAction();
                     break;
                 case COMBAT:
@@ -242,6 +253,15 @@ public abstract class Character implements Runnable{
                 case FOLLOWING:
                     followStateAction();
                     break;
+            }
+        }
+    }
+
+    private void processActionQueue(){
+        while(actionQueue.size()>0){
+            ActionRequest req = actionQueue.removeFirst();
+            if (req.getSTATE() == STATE) {
+                req.run();
             }
         }
     }
@@ -256,6 +276,19 @@ public abstract class Character implements Runnable{
             ", name='" + name + '\'' +
             '}';
     }
+    private void checkBuffs(){
+        selfBuffs.stream().filter(x -> !buffs.contains(x)).forEach(selfBuff);
+    }
+
+    private Consumer<Integer> selfBuff = x->{
+        ActionRequest selfBuff = new ActionRequest(CharacterState.REST) {
+            @Override
+            public void run() {
+                cast(x);
+            }
+        };
+        submitAction(selfBuff);
+    };
 
     abstract void restStateAction();
     abstract void followStateAction();

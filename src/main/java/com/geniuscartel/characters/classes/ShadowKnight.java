@@ -3,9 +3,6 @@ package com.geniuscartel.characters.classes;
 import com.geniuscartel.characters.ShortClass;
 import com.geniuscartel.workers.characterworkers.CharacterManager;
 
-import java.util.List;
-import java.util.function.Consumer;
-
 public class ShadowKnight extends Character {
     private ShortClass className = ShortClass.SHD;
 
@@ -17,7 +14,6 @@ public class ShadowKnight extends Character {
     void restStateAction() {
         synchronized (this) {
             try {
-                checkBuffs();
                 super.sendCommand(getName(), "//echo resting");
                 this.wait();
             } catch (InterruptedException e) {
@@ -49,16 +45,4 @@ public class ShadowKnight extends Character {
             }
         }
     }
-
-    private void checkBuffs(){
-        super.getSelfBuffs().forEach(checkBuff);
-    }
-
-    private Consumer<Integer> checkBuff = x->{
-        List<Integer> spells = super.getBuffs();
-        if(!spells.contains(x)){
-            super.cast(x);
-        }
-    };
-
 }

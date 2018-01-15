@@ -69,7 +69,7 @@ public class RequestWorker extends DequeWorker {
             String charName = packetGrabber.group(1);
             String updateList[] = packetGrabber.group(2).split("\\|");
             if(characters.exists(charName)){
-                characters.get(charName).updateState(updateList);
+                characters.get(charName).updateStats(updateList);
             }else{
                 characters.create(charName, updateList);
             }
