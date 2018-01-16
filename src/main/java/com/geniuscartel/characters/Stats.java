@@ -11,6 +11,22 @@ public class Stats {
         hpmax = Integer.parseInt(currMax[1]);
     }
 
+    public double pctHp(){
+        return (double) hp / (double) hpmax;
+    }
+
+    public double pctMana(){
+        return (double) mana / (double) manamax;
+    }
+
+    public int missingHp(){
+        return hpmax - hp;
+    }
+
+    public int missingMana(){
+        return manamax - mana;
+    }
+
     public void setMana(String manaString) {
         String[] couplet = manaString.split("=");
         String[] currMax = couplet[1].split("/");

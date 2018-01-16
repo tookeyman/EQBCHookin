@@ -276,8 +276,13 @@ public abstract class Character implements Runnable{
             ", name='" + name + '\'' +
             '}';
     }
+
     private void checkBuffs(){
         selfBuffs.stream().filter(x -> !buffs.contains(x)).forEach(selfBuff);
+    }
+
+    public void command(String command){
+        boss.submitCommand(name, "/"+command);
     }
 
     private Consumer<Integer> selfBuff = x->{
