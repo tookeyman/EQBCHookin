@@ -3,7 +3,7 @@ package com.geniuscartel.characters.classes;
 import com.geniuscartel.characters.ShortClass;
 import com.geniuscartel.workers.characterworkers.CharacterManager;
 
-public class ShadowKnight extends Character {
+public class ShadowKnight extends EQCharacter {
     private ShortClass className = ShortClass.SHD;
 
     public ShadowKnight(String name, String[] NBPacket, CharacterManager boss) {
@@ -14,7 +14,6 @@ public class ShadowKnight extends Character {
     void restStateAction() {
         synchronized (this) {
             try {
-                super.sendCommand(getName(), "//echo resting");
                 this.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -26,7 +25,6 @@ public class ShadowKnight extends Character {
     void followStateAction() {
         synchronized (this) {
             try {
-                super.sendCommand(getName(), "//echo following");
                 this.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -38,7 +36,6 @@ public class ShadowKnight extends Character {
     void combatStateAction() {
         synchronized (this) {
             try {
-                super.sendCommand(getName(), "//echo fighting");
                 this.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();

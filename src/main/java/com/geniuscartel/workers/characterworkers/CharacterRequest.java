@@ -9,7 +9,7 @@ public class CharacterRequest implements Callable{
     private final int id;
     private String requestedValue;
     private final HashMap<Integer, String> resultMap;
-    AsyncRequestInterop watcher;
+    private AsyncRequestInterop watcher;
 
     public CharacterRequest(int id, HashMap<Integer, String> resultMap, AsyncRequestInterop watcher) {
         this.id = id;

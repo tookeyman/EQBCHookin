@@ -3,7 +3,7 @@ package com.geniuscartel.characters.classes;
 import com.geniuscartel.characters.ShortClass;
 import com.geniuscartel.workers.characterworkers.CharacterManager;
 
-public class Magician extends Character {
+public class Magician extends EQCharacter {
     private ShortClass className = ShortClass.MAG;
 
     public Magician(String name, String[] NBPacket, CharacterManager boss) {

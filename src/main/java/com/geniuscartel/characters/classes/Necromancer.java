@@ -3,7 +3,7 @@ package com.geniuscartel.characters.classes;
 import com.geniuscartel.characters.ShortClass;
 import com.geniuscartel.workers.characterworkers.CharacterManager;
 
-public class Necromancer extends Character {
+public class Necromancer extends EQCharacter {
     private ShortClass className = ShortClass.NEC;
 
     public Necromancer(String name, String[] NBPacket, CharacterManager boss) {

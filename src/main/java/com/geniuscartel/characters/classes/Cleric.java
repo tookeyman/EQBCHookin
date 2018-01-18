@@ -1,7 +1,6 @@
 package com.geniuscartel.characters.classes;
 
 import com.geniuscartel.characters.ShortClass;
-import com.geniuscartel.characters.classes.archetypes.Buffer;
 import com.geniuscartel.characters.classes.archetypes.Healer;
 import com.geniuscartel.characters.classes.archetypes.ManaUser;
 import com.geniuscartel.workers.characterworkers.CharacterManager;
@@ -9,7 +8,7 @@ import com.geniuscartel.workers.characterworkers.CharacterManager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Cleric extends Character implements Healer, Buffer, ManaUser{
+public class Cleric extends EQCharacter implements Healer, ManaUser{
     private ShortClass className = ShortClass.CLR;
 
     public Cleric(String name, String[] NBPacket, CharacterManager boss) {
@@ -68,10 +67,7 @@ public class Cleric extends Character implements Healer, Buffer, ManaUser{
 
     @Override
     public void watchMana() {
-        if(getStats().pctMana() < 50.0){
-            if(queryForInfo("${Me.Standing}").equals("TRUE"))
-                command("/sit");
-        }
+
     }
 
     @Override
@@ -79,8 +75,5 @@ public class Cleric extends Character implements Healer, Buffer, ManaUser{
         return new ArrayList<>();
     }
 
-    @Override
-    public List<Integer> getAvailableBuffs() {
-        return new ArrayList<>();
-    }
+
 }

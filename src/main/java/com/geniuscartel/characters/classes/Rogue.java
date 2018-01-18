@@ -3,7 +3,7 @@ package com.geniuscartel.characters.classes;
 import com.geniuscartel.characters.ShortClass;
 import com.geniuscartel.workers.characterworkers.CharacterManager;
 
-public class Rogue extends Character {
+public class Rogue extends EQCharacter {
     private ShortClass className = ShortClass.ROG;
 
     public Rogue(String name, String[] NBPacket, CharacterManager boss) {

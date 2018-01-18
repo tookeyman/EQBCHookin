@@ -42,6 +42,7 @@ public class OutputWorker extends DequeWorker {
 
     @Deprecated
     public void sendBCIPacket(String input) {
+        Long start = System.currentTimeMillis();
         String command = sanitizeCommand(input);
         sendPackets(MsgType.CMD_BCI.getMessage(), command);
     }
@@ -53,11 +54,13 @@ public class OutputWorker extends DequeWorker {
     }
 
     public void sendCommandTo(String character, String input){
+        long start = System.currentTimeMillis();
         String command = sanitizeCommand(input);
         sendPackets(MsgType.CMD_TELL.getMessage() + character + " " + command);
     }
 
     public void sendCommandToAll(String input){
+        long start = System.currentTimeMillis();
         String command = sanitizeCommand(input);
         sendPackets(MsgType.CMD_MSGALL.getMessage(), command);
     }

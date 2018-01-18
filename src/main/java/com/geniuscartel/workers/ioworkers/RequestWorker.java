@@ -47,7 +47,7 @@ public class RequestWorker extends DequeWorker {
         }
         if(isClientList(request)){
             clientNames = updateClientList(request);
-            System.out.println("Updated Client names: " + clientNames);
+            App.updateActiveCharacters(clientNames);
             return;
         }
         if (isAsyncRequest(request)) {

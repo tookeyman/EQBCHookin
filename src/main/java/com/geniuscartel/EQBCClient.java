@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class EQBCClient {
     private Socket s;
@@ -94,14 +96,7 @@ public class EQBCClient {
     }
 
     private Runnable testMessages() {
-        return () -> {
-            try {
-                Future f = async.submitRequest("Zomgharmtouch", "${Me.ID}");
-                System.out.println(f.get());
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        };
+       return ()->{};
     }
 
     public void setRunning(boolean t){

@@ -1,27 +1,39 @@
 package com.geniuscartel.workers.characterworkers;
 
+import com.geniuscartel.App;
 import com.geniuscartel.characters.CharacterState;
 import com.geniuscartel.characters.ShortClass;
 import com.geniuscartel.characters.classes.*;
-import com.geniuscartel.characters.classes.Character;
+import com.geniuscartel.characters.services.BuffService;
 import com.geniuscartel.workers.ioworkers.AsyncRequestInterop;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class CharacterManager {
-    private final HashMap<String, Character> characters;
+    private final HashMap<String, EQCharacter> characters;
     private ExecutorService IO_THREADS;
     private AsyncRequestInterop async;
+    private BuffService buffs;
 
     public CharacterManager(ExecutorService IOTHREADS, AsyncRequestInterop async) {
         this.IO_THREADS = IOTHREADS;
         this.async = async;
         characters = new HashMap<>();
+        buffs = new BuffService();
+    }
+
+    public boolean requestBuff(EQCharacter c, String buff) {
+        if (!buffs.checkIfCharactersChanged(App.getActiveCharacters().size())) {
+            buffs.updateBuffers(characters.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList()));
+        }
+        buffs.printAvailableBuffers();
+        return buffs.requestBuff(c, buff);
     }
 
     public void setGlobalState(CharacterState cs){
@@ -32,7 +44,7 @@ public class CharacterManager {
         return characters.containsKey(charname);
     }
 
-    public Character get(String key){
+    public EQCharacter get(String key){
         return characters.get(key);
     }
 
@@ -65,8 +77,8 @@ public class CharacterManager {
         IO_THREADS.execute(createNewCharacter(key, value));
     }
 
-    private Character getCharacterConstructorFromEnum(ShortClass shrt, String key, String[] value){
-        Character cha = null;
+    private EQCharacter getCharacterConstructorFromEnum(ShortClass shrt, String key, String[] value){
+        EQCharacter cha = null;
         switch (shrt) {
             case BER:
                 cha = new Berserker(key, value, this);
@@ -122,22 +134,14 @@ public class CharacterManager {
 
     private Runnable createNewCharacter(String key, String[] value){
         return ()-> {
-            Future className = async.submitRequest(key, "${Me.Class.ShortName}");
-            Character cha = null;
-            while (!className.isDone()) {
-                try {
-                    synchronized (this) {
-                        this.wait(500);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+            EQCharacter cha = null;
             try {
-                ShortClass shrt = ShortClass.valueOf(className.get().toString());
+                String className = async.synchronousInformation(key, "${Me.Class.ShortName}");
+                ShortClass shrt = ShortClass.valueOf(className);
                 cha = getCharacterConstructorFromEnum(shrt, key, value);
                 if (cha != null) {
                     synchronized (characters) {
+                        System.out.println("putting eqcharacter" + key+ " " + cha);
                         characters.put(key, cha);
                         IO_THREADS.execute(cha);
                     }

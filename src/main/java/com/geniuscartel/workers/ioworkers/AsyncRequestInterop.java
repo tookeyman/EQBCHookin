@@ -4,6 +4,7 @@ import com.geniuscartel.workers.characterworkers.CharacterRequest;
 
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.function.IntPredicate;
@@ -53,17 +54,53 @@ public class AsyncRequestInterop {
     }
 
     public void oneWayCommand(String character, String command){
+        long start = System.currentTimeMillis();
+        rateLimit(start);
         output.sendCommandTo(character, command);
     }
 
-    public Future<String> submitRequest(String character, String command){
+    public int submitRequest(String character, String command, AsyncHook runner){
+        long start = System.currentTimeMillis();
         //todo this has to talk to the mq scripts. right now it's fucking awful
         CharacterRequest pendingRequest = new CharacterRequest(assignRequestNumber(), resultMap, this);
         requests.put(pendingRequest.getId(), pendingRequest);
         String constructedCommand = String.format("//bct Orchestrator ASYNC:%d::%s", pendingRequest.getId(), command);
-        System.out.println("[ASYNC]\tIssuing: " + character + " -> " + constructedCommand);
+//        System.out.println("[ASYNC]\tIssuing: " + character + " -> " + constructedCommand);
         output.sendCommandTo(character, constructedCommand);
-        return threadPool.submit(pendingRequest);
+        rateLimit(start);
+        runner.acceptFuture(pendingRequest, threadPool);
+        return pendingRequest.hashCode();
+    }
+
+    public String synchronousInformation(String characterName, String command) throws ExecutionException, InterruptedException {
+        CharacterRequest pendingRequest = new CharacterRequest(assignRequestNumber(), resultMap, this);
+        requests.put(pendingRequest.getId(), pendingRequest);
+        String constructedCommand = String.format("//bct Orchestrator ASYNC:%d::%s", pendingRequest.getId(), command);
+//        System.out.println("[ASYNC]\tIssuing: " + character + " -> " + constructedCommand);
+        output.sendCommandTo(characterName, constructedCommand);
+        Future result = threadPool.submit(pendingRequest);
+        while(!result.isDone()){
+            synchronized (this) {
+                wait(10);
+            }
+
+        }
+        return result.get().toString();
+    }
+
+    private void rateLimit(long start){
+        double rateLimit = 1000.0/10.0;
+        long duration = System.currentTimeMillis() - start;
+        long delT = (long)Math.floor(rateLimit) - duration;
+        while ((System.currentTimeMillis() - start) < delT) {
+            try {
+                synchronized (this) {
+                    this.wait(10);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private int assignRequestNumber(){
