@@ -5,16 +5,15 @@ import com.geniuscartel.characters.Command;
 import com.geniuscartel.characters.Stats;
 import com.geniuscartel.characters.services.CharacterSaveService;
 import com.geniuscartel.workers.characterworkers.CharacterManager;
-import com.geniuscartel.workers.ioworkers.AsyncHook;
+import com.geniuscartel.workers.characterworkers.CharacterRequest;
 
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public abstract class EQCharacter implements Runnable, AsyncHook {
+public abstract class EQCharacter implements Runnable {
     private List<Integer> buffs;
     private Stats stats;
     private int casting = 0, id = -1;
@@ -27,16 +26,9 @@ public abstract class EQCharacter implements Runnable, AsyncHook {
     private CharacterState STATE = CharacterState.REST;
     private final ArrayDeque<Command> actionQueue = new ArrayDeque<>();
     private CharacterSaveService characterSaveService;
-    private final ConcurrentHashMap<Integer, Future> pendingFutures = new ConcurrentHashMap<>();
 
     public List<Integer> getBuffs() {
         return buffs;
-    }
-
-    @Override
-    public void acceptFuture(Callable future, ExecutorService IO_THREAD) {
-        System.out.println("accepting future for "+future.toString());
-        pendingFutures.put(future.hashCode(), IO_THREAD.submit(future));
     }
 
     public void submitCommand(Command request) {
@@ -199,19 +191,14 @@ public abstract class EQCharacter implements Runnable, AsyncHook {
 
     public String queryForInfo(String query) {
         String answer = "";
-        int hash = boss.getAsync().submitRequest(name, query, this);
-        while (!pendingFutures.get(hash).isDone()) {
-            processFutureQueue();
-        }
+        CharacterRequest pending = boss.getAsync().submitAsyncQuery(this, query);
         try {
-            answer = pendingFutures.get(hash).get().toString();
-                System.out.println("got query answer: " + answer);
-        } catch (InterruptedException | ExecutionException e) {
+            answer = pending.call();
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return answer;
     }
-
 
     public void cast(String spellID) {
         boss.submitCommand(name, String.format("//casting \"%s\"", spellID));
@@ -264,34 +251,14 @@ public abstract class EQCharacter implements Runnable, AsyncHook {
         return selfBuffs;
     }
 
-    private void processFutureQueue() {
-        if (pendingFutures.size() < 1){
-            try{
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return;
-        }
-        synchronized (pendingFutures) {
-            pendingFutures.entrySet().stream().filter(x -> x.getValue().isDone()).forEach(x -> {
-                synchronized (x) {
-                    x.notify();
-                }
-            });
-        }
-
-    }
-
     @Override
     public void run() {
         while (running) {
-            processFutureQueue();
             processActionQueue();
             switch (STATE) {
                 case REST:
-                    checkBuffs();
-//                    benchMark();
+//                    checkBuffs();
+                    benchMark();
                     try {
                         synchronized (this) {
                             this.wait(1000);

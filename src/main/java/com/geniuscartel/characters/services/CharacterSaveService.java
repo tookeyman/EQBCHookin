@@ -14,14 +14,23 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CharacterSaveService {
-    private AsyncRequestInterop threads;
-    private String server = null;
+    private static AsyncRequestInterop threads;
+    private static String server = null;
 
     public CharacterSaveService(AsyncRequestInterop threads) {
-        this.threads = threads;
+        setThreads(threads);
     }
 
-    private String getServer(){
+    private static void setThreads(AsyncRequestInterop async){
+        if(threads == null)
+            threads = async;
+    }
+
+    private static AsyncRequestInterop getThreads(){
+        return threads;
+    }
+
+    private static String getServer(){
         if (server == null) {
             try {
                 server = threads.synchronousInformation(App.getActiveCharacters().get(0), "${MacroQuest}.Server");

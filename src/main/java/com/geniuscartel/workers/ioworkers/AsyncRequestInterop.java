@@ -1,9 +1,11 @@
 package com.geniuscartel.workers.ioworkers;
 
+import com.geniuscartel.characters.classes.EQCharacter;
 import com.geniuscartel.workers.characterworkers.CharacterRequest;
 
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -12,6 +14,7 @@ import java.util.stream.IntStream;
 
 public class AsyncRequestInterop {
     private final TreeMap<Integer, CharacterRequest> requests = new TreeMap<>();
+    private final ConcurrentHashMap<Integer, EQCharacter> pending = new ConcurrentHashMap<>();
     private final HashMap<Integer, String> resultMap = new HashMap<>();
     private ExecutorService threadPool;
     private OutputWorker output;
@@ -19,6 +22,16 @@ public class AsyncRequestInterop {
     public AsyncRequestInterop(ExecutorService threadPool, OutputWorker output) {
         this.threadPool = threadPool;
         this.output = output;
+    }
+
+    public CharacterRequest submitAsyncQuery(EQCharacter c, String command){
+        CharacterRequest pendingRequest = new CharacterRequest(assignRequestNumber(), resultMap, this);
+        requests.put(pendingRequest.getId(), pendingRequest);
+        pending.put(pendingRequest.getId(), c);
+        String constructedCommand = String.format("//bct Orchestrator ASYNC:%d::%s", pendingRequest.getId(), command);
+//        System.out.println("[ASYNC]\tIssuing: " + character + " -> " + constructedCommand);
+        output.sendCommandTo(c.getName(), constructedCommand);
+        return pendingRequest;
     }
 
     synchronized public void updateResultMap(int reference, String value) {
@@ -59,19 +72,6 @@ public class AsyncRequestInterop {
         output.sendCommandTo(character, command);
     }
 
-    public int submitRequest(String character, String command, AsyncHook runner){
-        long start = System.currentTimeMillis();
-        //todo this has to talk to the mq scripts. right now it's fucking awful
-        CharacterRequest pendingRequest = new CharacterRequest(assignRequestNumber(), resultMap, this);
-        requests.put(pendingRequest.getId(), pendingRequest);
-        String constructedCommand = String.format("//bct Orchestrator ASYNC:%d::%s", pendingRequest.getId(), command);
-//        System.out.println("[ASYNC]\tIssuing: " + character + " -> " + constructedCommand);
-        output.sendCommandTo(character, constructedCommand);
-        rateLimit(start);
-        runner.acceptFuture(pendingRequest, threadPool);
-        return pendingRequest.hashCode();
-    }
-
     public String synchronousInformation(String characterName, String command) throws ExecutionException, InterruptedException {
         CharacterRequest pendingRequest = new CharacterRequest(assignRequestNumber(), resultMap, this);
         requests.put(pendingRequest.getId(), pendingRequest);
@@ -105,11 +105,14 @@ public class AsyncRequestInterop {
 
     private int assignRequestNumber(){
         if(requests.size() == 0) return 0;
-        return IntStream.iterate(0, i -> i + 1).limit(requests.size()+1).filter(isInUse).findFirst().orElse(-1);
+        return IntStream.range(0, requests.size()+1).filter(isInUse).findFirst().orElse(-1);
     }
 
     public void releaseRequest(int key){
         requests.remove(key);
+        if (pending.contains(key)) {
+            pending.remove(key).notify();
+        }
     }
 
     private IntPredicate isInUse = x -> !requests.containsKey(x);
