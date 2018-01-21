@@ -11,12 +11,12 @@ public class ActionManager {
 
     public void cast(String spellID) {
         final CommandFactory.MultiStageCommand casting = createCastCommand(String.format("//casting \"%s\"", spellID));
-        ME.submitCommand(casting);
+        ME.enqueCommand(casting);
     }
 
     public void castAtTarget(String spellID, int ID) {
         final CommandFactory.MultiStageCommand command = createCastCommand(String.format("/casting \"%s\" -targetID|%d", spellID, ID));
-        ME.submitCommand(command);
+        ME.enqueCommand(command);
     }
 
     private CommandFactory.MultiStageCommand createCastCommand(String commandString){

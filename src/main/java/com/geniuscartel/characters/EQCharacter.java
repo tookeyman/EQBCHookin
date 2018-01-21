@@ -1,6 +1,6 @@
 package com.geniuscartel.characters;
 
-import com.geniuscartel.characters.services.MovementManager;
+import com.geniuscartel.characters.movement.MovementManager;
 import com.geniuscartel.characters.services.SaveService;
 import com.geniuscartel.workers.characterworkers.CharacterInfoQuery;
 import com.geniuscartel.workers.characterworkers.CharacterManager;
@@ -40,7 +40,7 @@ public abstract class EQCharacter implements Runnable {
         return this.name;
     }
 
-    CharacterManager getCharacterManager(){
+    protected CharacterManager getCharacterManager(){
         return this.characterManager;
     }
 
@@ -50,6 +50,10 @@ public abstract class EQCharacter implements Runnable {
 
     public Status getStatus() {
         return this.status;
+    }
+
+    public MovementManager getMovementManager() {
+        return movementManager;
     }
 
     public int getActionQueueDepth() {
@@ -68,7 +72,7 @@ public abstract class EQCharacter implements Runnable {
         this.characterRunning = characterRunning;
     }
 
-    public void submitCommand(Command request) {
+    public void enqueCommand(Command request) {
         currentActionDescription = "Submitting Command";
         this.actionQueue.add(request);
     }
@@ -93,7 +97,6 @@ public abstract class EQCharacter implements Runnable {
                 case REST:
                     buffManager.checkForExpiredBuffs();
 //                    benchMark();
-                    System.out.println(name+ "   REST");
                     restStateAction();
                     break;
                 case COMBAT:
@@ -112,13 +115,12 @@ public abstract class EQCharacter implements Runnable {
             System.out.printf("[%s]\tHave pending actions: %d\r\n", name, actionQueue.size());
             final Command req = actionQueue.removeFirst();
             if (req.getSTATE() == ANY || req.getSTATE() == status.getState()) {
-                System.out.println("["+name+"]\tExecuting " + req.getClass().getSimpleName());
+                System.out.println("["+name+"]\tExecuting " + req.getClass());
                 req.apply();
             }else{
                 System.out.println("states don't match, discarding stupid fucking action");
             }
         }
-        System.out.println("leaving action queue");
     }
 
     private void benchMark() {

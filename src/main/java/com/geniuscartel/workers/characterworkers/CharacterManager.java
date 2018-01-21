@@ -53,6 +53,10 @@ public class CharacterManager {
         buffs.requestBuff(c, buff);
     }
 
+    public EQCharacter getCharacterByName(String name) {
+        return characters.get(name);
+    }
+
     public void setGlobalState(CharacterState cs){
         characters.entrySet().stream().forEach(x->x.getValue().getStatus().setState(cs));
     }

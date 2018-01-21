@@ -44,7 +44,7 @@ public class BuffService {
         request.setReleaseRequest(r);
         pendingRequests.add(request);
         CommandFactory.BuffCommand command = CommandFactory.createBuffCommand(request);
-        caster.submitCommand(command);
+        caster.enqueCommand(command);
         synchronized (caster) {
             caster.currentActionDescription = "notifying for buff";
             caster.notify();
