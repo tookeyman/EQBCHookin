@@ -1,8 +1,8 @@
 package com.geniuscartel.characters.services;
 
 import com.geniuscartel.App;
-import com.geniuscartel.characters.classes.EQCharacter;
-import com.geniuscartel.workers.ioworkers.AsyncRequestInterop;
+import com.geniuscartel.characters.EQCharacter;
+import com.geniuscartel.workers.ioworkers.EQCharacterInterface;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -13,32 +13,45 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class CharacterSaveService {
-    private static AsyncRequestInterop threads;
+public class SaveService {
+    private static EQCharacterInterface threads;
     private static String server = null;
 
-    public CharacterSaveService(AsyncRequestInterop threads) {
+    public SaveService(EQCharacterInterface threads) {
         setThreads(threads);
     }
 
-    private static void setThreads(AsyncRequestInterop async){
+    private static void setThreads(EQCharacterInterface async){
         if(threads == null)
             threads = async;
     }
 
-    private static AsyncRequestInterop getThreads(){
+    private static EQCharacterInterface getThreads(){
         return threads;
+    }
+
+    public static void initServerName(EQCharacterInterface thread){
+        try {
+            while (App.getActiveCharacters() == null || App.getActiveCharacters().size() == 0) {
+                Thread.sleep(100);
+            }
+            String charName = App.getActiveCharacters().get(0);
+            server = thread.submitSynchronousQuery(charName, "${MacroQuest.Server}");
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private static String getServer(){
         if (server == null) {
             try {
-                server = threads.synchronousInformation(App.getActiveCharacters().get(0), "${MacroQuest}.Server");
-            } catch (ExecutionException e) {
-                e.printStackTrace();
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            return getServer();
         }
         return server;
     }
@@ -53,8 +66,6 @@ public class CharacterSaveService {
         }
         return new ArrayList<>();
     }
-
-
 
     private File getFileForKey(EQCharacter c, String key) {
         String server = getServer();

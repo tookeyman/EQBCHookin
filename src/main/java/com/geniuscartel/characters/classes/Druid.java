@@ -1,5 +1,6 @@
 package com.geniuscartel.characters.classes;
 
+import com.geniuscartel.characters.EQCharacter;
 import com.geniuscartel.characters.ShortClass;
 import com.geniuscartel.workers.characterworkers.CharacterManager;
 
@@ -11,7 +12,7 @@ public class Druid extends EQCharacter {
     }
 
     @Override
-    void restStateAction() {
+    public void restStateAction() {
         synchronized (this) {
             try {
                 this.wait();
@@ -22,7 +23,7 @@ public class Druid extends EQCharacter {
     }
 
     @Override
-    void followStateAction() {
+    public void followStateAction() {
         synchronized (this) {
             try {
                 this.wait();
@@ -33,7 +34,7 @@ public class Druid extends EQCharacter {
     }
 
     @Override
-    void combatStateAction() {
+    public void combatStateAction() {
         synchronized (this) {
             try {
                 this.wait();

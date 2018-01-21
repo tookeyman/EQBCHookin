@@ -1,7 +1,7 @@
 package com.geniuscartel;
 
 import com.geniuscartel.workers.characterworkers.CharacterManager;
-import com.geniuscartel.workers.ioworkers.AsyncRequestInterop;
+import com.geniuscartel.workers.ioworkers.EQCharacterInterface;
 import com.geniuscartel.workers.ioworkers.OutputWorker;
 import com.geniuscartel.workers.ioworkers.RequestWorker;
 
@@ -23,7 +23,7 @@ public class EQBCClient {
 
     private RequestWorker requestWorker;
     private OutputWorker outputWorker;
-    private AsyncRequestInterop async;
+    private EQCharacterInterface async;
 
     private final static ExecutorService IO_THREADS = Executors.newCachedThreadPool();
     private CharacterManager characters;
@@ -34,30 +34,25 @@ public class EQBCClient {
             this.socketOut = s.getOutputStream();
             this.socketIn = new BufferedReader(new InputStreamReader(s.getInputStream()));
         } catch (IOException e) {
-            System.out.println("[CLIENT]\tCould not create socket...");
+            System.out.println("[CLIENT]\tCould not createBuffCommand socket...");
         }
         outputWorker = new OutputWorker(socketOut);
-
-
-        async = new AsyncRequestInterop(IO_THREADS, outputWorker);
-
-
+        async = new EQCharacterInterface(IO_THREADS, outputWorker);
         characters = new CharacterManager(IO_THREADS, async);
-
         requestWorker = new RequestWorker(characters);
+
+
         requestWorker.setOutputWorker(outputWorker);
         requestWorker.setAsync(async);
         outputWorker.setRequestWorker(requestWorker);
 
         IO_THREADS.execute(outputWorker);
         IO_THREADS.execute(requestWorker);
-
-
+        IO_THREADS.execute(()->characters.initializeSaveService());
     }
 
-
     public void shutDownWorkers(){
-        //todo create a mechanism for shutting down the orchestrator from a character
+        //todo createBuffCommand a mechanism for shutting down the orchestrator from a character
         outputWorker.setRunning(false);
         requestWorker.setRunning(false);
         outputWorker.notifyQue();
@@ -77,14 +72,10 @@ public class EQBCClient {
         boolean triggered = false;
         while (running) {
             String currentRequest = null;
-
-
             if(!triggered){
-
+                //test methods go here
                 triggered = true;
             }
-
-
             try {
                 currentRequest = socketIn.readLine();
                 requestWorker.addToQue(currentRequest);
@@ -93,10 +84,6 @@ public class EQBCClient {
             }
             requestWorker.notifyQue();
         }
-    }
-
-    private Runnable testMessages() {
-       return ()->{};
     }
 
     public void setRunning(boolean t){

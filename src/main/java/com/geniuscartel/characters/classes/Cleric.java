@@ -1,5 +1,6 @@
 package com.geniuscartel.characters.classes;
 
+import com.geniuscartel.characters.EQCharacter;
 import com.geniuscartel.characters.ShortClass;
 import com.geniuscartel.characters.classes.archetypes.Healer;
 import com.geniuscartel.characters.classes.archetypes.ManaUser;
@@ -16,19 +17,7 @@ public class Cleric extends EQCharacter implements Healer, ManaUser{
     }
 
     @Override
-    void restStateAction() {
-        synchronized (this) {
-            try {
-                watchMana();
-                this.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    void followStateAction() {
+    public void restStateAction() {
         synchronized (this) {
             try {
                 this.wait();
@@ -39,7 +28,18 @@ public class Cleric extends EQCharacter implements Healer, ManaUser{
     }
 
     @Override
-    void combatStateAction() {
+    public void followStateAction() {
+        synchronized (this) {
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void combatStateAction() {
         synchronized (this) {
             try {
                 this.wait();

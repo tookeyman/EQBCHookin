@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class RequestWorker extends DequeWorker {
     private OutputWorker outputWorker;
     private List<String> clientNames = new ArrayList<>();
-    private AsyncRequestInterop async;
+    private EQCharacterInterface async;
     private CharacterManager characters;
 
 
@@ -26,7 +26,7 @@ public class RequestWorker extends DequeWorker {
         this.outputWorker = out;
     }
 
-    public void setAsync(AsyncRequestInterop async) {
+    public void setAsync(EQCharacterInterface async) {
         this.async = async;
     }
 
@@ -69,7 +69,7 @@ public class RequestWorker extends DequeWorker {
             String charName = packetGrabber.group(1);
             String updateList[] = packetGrabber.group(2).split("\\|");
             if(characters.exists(charName)){
-                characters.get(charName).updateStats(updateList);
+                characters.get(charName).getStatus().processUpdatePacket(updateList);
             }else{
                 characters.create(charName, updateList);
             }

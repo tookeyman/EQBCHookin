@@ -2,12 +2,16 @@ package com.geniuscartel.workers.characterworkers;
 
 import com.geniuscartel.App;
 import com.geniuscartel.characters.CharacterState;
+import com.geniuscartel.characters.EQCharacter;
 import com.geniuscartel.characters.ShortClass;
 import com.geniuscartel.characters.classes.*;
 import com.geniuscartel.characters.services.BuffService;
-import com.geniuscartel.workers.ioworkers.AsyncRequestInterop;
+import com.geniuscartel.characters.services.SaveService;
+import com.geniuscartel.workers.ioworkers.EQCharacterInterface;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -17,27 +21,40 @@ import java.util.stream.Collectors;
 
 public class CharacterManager {
     private final HashMap<String, EQCharacter> characters;
-    private ExecutorService IO_THREADS;
-    private AsyncRequestInterop async;
-    private BuffService buffs;
+    private ExecutorService IOThreads;
+    private EQCharacterInterface async;
+    private BuffService buffs = null;
+    private boolean creationFlush = false;
+    private EventQue creationEvent = new EventQue();
 
-    public CharacterManager(ExecutorService IOTHREADS, AsyncRequestInterop async) {
-        this.IO_THREADS = IOTHREADS;
+    public CharacterManager(ExecutorService IOTHREADS, EQCharacterInterface async) {
+        this.IOThreads = IOTHREADS;
         this.async = async;
         characters = new HashMap<>();
         buffs = new BuffService();
+
     }
 
-    public boolean requestBuff(EQCharacter c, String buff) {
-        if (!buffs.checkIfCharactersChanged(App.getActiveCharacters().size())) {
+    public void requestBuff(EQCharacter c, String buff) throws Error{
+        if (buffs == null) {
+            synchronized (this){
+                try {
+                    this.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        if (!buffs.checkIfCharactersChanged(characters.entrySet().size())) {
             buffs.updateBuffers(characters.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList()));
         }
-        buffs.printAvailableBuffers();
-        return buffs.requestBuff(c, buff);
+
+        buffs.requestBuff(c, buff);
     }
 
     public void setGlobalState(CharacterState cs){
-        characters.entrySet().stream().forEach(x->x.getValue().setSTATE(cs));
+        characters.entrySet().stream().forEach(x->x.getValue().getStatus().setState(cs));
     }
 
     public boolean exists(String charname){
@@ -52,7 +69,7 @@ public class CharacterManager {
         async.oneWayCommand(character, command);
     }
 
-    public AsyncRequestInterop getAsync() {
+    public EQCharacterInterface getAsync() {
         return async;
     }
     public void submitRequest(String request) {
@@ -73,8 +90,19 @@ public class CharacterManager {
                 setGlobalState(CharacterState.valueOf(comSplit[1]));
         }
     }
+
     public void create(String key, String[] value){
-        IO_THREADS.execute(createNewCharacter(key, value));
+        Runnable r = createNewCharacter(key, value);
+        creationEvent.addCommand(r);
+        if (creationFlush) {
+            IOThreads.execute(creationEvent);
+        } else {
+            if (creationEvent.queueDepth() == App.ActiveCharacters.size()) {
+                creationEvent.addCommand(()->this.buffs = new BuffService());
+                IOThreads.execute(creationEvent);
+                creationFlush = true;
+            }
+        }
     }
 
     private EQCharacter getCharacterConstructorFromEnum(ShortClass shrt, String key, String[] value){
@@ -136,14 +164,14 @@ public class CharacterManager {
         return ()-> {
             EQCharacter cha = null;
             try {
-                String className = async.synchronousInformation(key, "${Me.Class.ShortName}");
+                String className = async.submitSynchronousQuery(key, "${Me.Class.ShortName}");
                 ShortClass shrt = ShortClass.valueOf(className);
                 cha = getCharacterConstructorFromEnum(shrt, key, value);
                 if (cha != null) {
                     synchronized (characters) {
-                        System.out.println("putting eqcharacter" + key+ " " + cha);
+                        System.out.println("[CHARACTER MANAGER]\tRegistering: " + key);
                         characters.put(key, cha);
-                        IO_THREADS.execute(cha);
+                        IOThreads.execute(cha);
                     }
                 }else{
                     //no character
@@ -152,5 +180,28 @@ public class CharacterManager {
                 e.printStackTrace();
             }
         };
+    }
+
+    public void initializeSaveService() {
+        SaveService.initServerName(async);
+    }
+}
+
+class EventQue implements Runnable{
+    List<Runnable> commands = new ArrayList<>();
+
+    public void addCommand(Runnable r){
+        this.commands.add(r);
+    }
+
+    public int queueDepth(){
+        return commands.size();
+    }
+
+    @Override
+    public void run() {
+        while(commands.size()>0){
+            commands.remove(0).run();
+        }
     }
 }

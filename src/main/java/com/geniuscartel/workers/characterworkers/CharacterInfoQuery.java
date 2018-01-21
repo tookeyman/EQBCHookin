@@ -1,17 +1,17 @@
 package com.geniuscartel.workers.characterworkers;
 
-import com.geniuscartel.workers.ioworkers.AsyncRequestInterop;
+import com.geniuscartel.workers.ioworkers.EQCharacterInterface;
 
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 
-public class CharacterRequest implements Callable{
+public class CharacterInfoQuery implements Callable{
     private final int id;
     private String requestedValue;
     private final HashMap<Integer, String> resultMap;
-    private AsyncRequestInterop watcher;
+    private EQCharacterInterface watcher;
 
-    public CharacterRequest(int id, HashMap<Integer, String> resultMap, AsyncRequestInterop watcher) {
+    public CharacterInfoQuery(int id, HashMap<Integer, String> resultMap, EQCharacterInterface watcher) {
         this.id = id;
         this.resultMap = resultMap;
         this.watcher = watcher;
