@@ -1,5 +1,6 @@
 package com.geniuscartel.characters;
 
+import com.geniuscartel.characters.services.MovementManager;
 import com.geniuscartel.characters.services.SaveService;
 import com.geniuscartel.workers.characterworkers.CharacterInfoQuery;
 import com.geniuscartel.workers.characterworkers.CharacterManager;
@@ -21,6 +22,7 @@ public abstract class EQCharacter implements Runnable {
     private final CharacterManager characterManager;
     private final BuffManager buffManager;
     private final ActionManager actionManager;
+    private final MovementManager movementManager;
     private final ArrayDeque<Command> actionQueue = new ArrayDeque<>();
 
     public EQCharacter(String name, String[] NBPacket, CharacterManager characterManager) {
@@ -30,7 +32,8 @@ public abstract class EQCharacter implements Runnable {
         this.saveService = new SaveService(characterManager.getAsync());
         this.buffManager = new BuffManager(this, this.saveService);
         this.status.processUpdatePacket(NBPacket);
-        actionManager = new ActionManager(this);
+        this.actionManager = new ActionManager(this);
+        this.movementManager = new MovementManager(this);
     }
 
     public String getName() {

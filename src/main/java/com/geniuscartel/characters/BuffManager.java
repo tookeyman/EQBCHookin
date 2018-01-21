@@ -81,12 +81,12 @@ public class BuffManager {
         final String buffDurationString = getNeededBuffs().stream().map(spellNameToDuration).collect(Collectors.joining());
         final String response = me.queryForInfo(buffDurationString);
         final List<String> results = Arrays.asList(response.split("\\|"));
-        results.forEach(x -> processDurationResponse(x, duration));
+        results.forEach(buffComposition -> processDurationResponse(buffComposition, duration));
         return duration;
     }
 
-    private void processDurationResponse(String y, HashMap<String, Integer> duration){
-        final String[] temp = y.split(":");
+    private void processDurationResponse(String buffComposition, HashMap<String, Integer> duration){
+        final String[] temp = buffComposition.split(":");
         if (temp.length > 1) {
             final int dur = temp[1].equals("NULL") ? -1 : Integer.parseInt(temp[1]);
             duration.put(temp[0], dur);
