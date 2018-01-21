@@ -32,7 +32,6 @@ public class ActionManager {
         synchronized (ME) {
             try {
                 while (ME.getStatus().getCasting() == -1) {
-                    ME.currentActionDescription = "waiting for casting started";
                     ME.wait();
                 }
             } catch (InterruptedException e) {
@@ -45,7 +44,6 @@ public class ActionManager {
         synchronized (ME) {
             while (ME.getStatus().getCasting() > -1) {
                 try {
-                    ME.currentActionDescription = "waiting for casting finished";
                     ME.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

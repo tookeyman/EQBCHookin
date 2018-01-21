@@ -46,9 +46,7 @@ public class BuffService {
         CommandFactory.BuffCommand command = CommandFactory.createBuffCommand(request);
         caster.enqueCommand(command);
         synchronized (caster) {
-            caster.currentActionDescription = "notifying for buff";
             caster.notify();
-            caster.currentActionDescription = "finished notifying for buff";
         }
     }
 

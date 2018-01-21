@@ -61,7 +61,6 @@ public class BuffManager {
     }
 
     void checkForExpiredBuffs() {
-        me.currentActionDescription = "checking for expired buffs";
         final HashMap<String, Integer> durationMap = createDurationMap();
         durationMap.entrySet().stream()
             .filter(x -> x.getValue() < 20)

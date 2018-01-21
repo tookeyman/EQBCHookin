@@ -16,8 +16,6 @@ public abstract class EQCharacter implements Runnable {
     private final String name;
     private boolean characterRunning = true;
 
-    public String currentActionDescription = "";
-
     private final SaveService saveService;
     private final CharacterManager characterManager;
     private final BuffManager buffManager;
@@ -73,12 +71,10 @@ public abstract class EQCharacter implements Runnable {
     }
 
     public void enqueCommand(Command request) {
-        currentActionDescription = "Submitting Command";
         this.actionQueue.add(request);
     }
 
     public String queryForInfo(String query) {
-        currentActionDescription = "Querying for info";
         String answer = "";
         final CharacterInfoQuery pending = characterManager.getAsync().submitAsyncQuery(this, query);
         try {
@@ -110,9 +106,7 @@ public abstract class EQCharacter implements Runnable {
     }
 
     private void processActionQueue() {
-        currentActionDescription = "processing action queue";
         while (actionQueue.size() > 0) {
-            System.out.printf("[%s]\tHave pending actions: %d\r\n", name, actionQueue.size());
             final Command req = actionQueue.removeFirst();
             if (req.getSTATE() == ANY || req.getSTATE() == status.getState()) {
                 System.out.println("["+name+"]\tExecuting " + req.getClass());

@@ -22,6 +22,4 @@ public class MovementManager {
         ME.enqueCommand(move);
         ME.notify();
     }
-
-
 }
