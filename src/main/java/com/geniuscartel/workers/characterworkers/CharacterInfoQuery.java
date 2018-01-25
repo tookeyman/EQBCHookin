@@ -26,10 +26,12 @@ public class CharacterInfoQuery implements Callable{
         synchronized (this){
             this.wait();
         }
+
         requestedValue = resultMap.get(this.id);
         synchronized (resultMap){
             resultMap.remove(this.id);
         }
+
         watcher.releaseRequest(this.id);
         return requestedValue;
     }

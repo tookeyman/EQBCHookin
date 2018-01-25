@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 public class Status {
     private int casting = 0, id = -1;
     private int hp = 0, mana = 0, end = 0, hpmax = 0, endmax = 0, manamax = 0, level = 0, xp = 0;
-    private Location pos;
+    private Location loc;
     private CharacterState state = CharacterState.REST;
     private List<Integer> buffs = null;
     private final EQCharacter me;
@@ -23,6 +23,10 @@ public class Status {
 
     public void setCasting(int casting) {
         this.casting = casting;
+    }
+
+    public Location getLoc() {
+        return loc;
     }
 
     public int getId() {
@@ -131,7 +135,7 @@ public class Status {
     public void setLocation(String locString){
         String[] couplet = locString.split("=");
         String[] coords = couplet[1].split(":");
-        this.pos = new Location(
+        this.loc = new Location(
             Float.parseFloat(coords[1]),
             Float.parseFloat(coords[0]),
             Float.parseFloat(coords[2]),
@@ -148,7 +152,7 @@ public class Status {
             ", hpmax=" + hpmax +
             ", endmax=" + endmax +
             ", manamax=" + manamax +
-            ", pos=" + pos +
+            ", loc=" + loc +
             '}';
     }
 

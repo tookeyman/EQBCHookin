@@ -1,5 +1,6 @@
 package com.geniuscartel.characters;
 
+import com.geniuscartel.characters.movement.MovementManager;
 import com.geniuscartel.characters.services.SaveService;
 import com.geniuscartel.workers.characterworkers.CharacterInfoQuery;
 import com.geniuscartel.workers.characterworkers.CharacterManager;
@@ -15,12 +16,11 @@ public abstract class EQCharacter implements Runnable {
     private final String name;
     private boolean characterRunning = true;
 
-    public String currentActionDescription = "";
-
     private final SaveService saveService;
     private final CharacterManager characterManager;
     private final BuffManager buffManager;
     private final ActionManager actionManager;
+    private final MovementManager movementManager;
     private final ArrayDeque<Command> actionQueue = new ArrayDeque<>();
 
     public EQCharacter(String name, String[] NBPacket, CharacterManager characterManager) {
@@ -30,15 +30,20 @@ public abstract class EQCharacter implements Runnable {
         this.saveService = new SaveService(characterManager.getAsync());
         this.buffManager = new BuffManager(this, this.saveService);
         this.status.processUpdatePacket(NBPacket);
-        actionManager = new ActionManager(this);
+        this.actionManager = new ActionManager(this);
+        this.movementManager = new MovementManager(this);
     }
 
     public String getName() {
         return this.name;
     }
 
-    CharacterManager getCharacterManager(){
+    protected CharacterManager getCharacterManager(){
         return this.characterManager;
+    }
+
+    protected SaveService getSaveService(){
+        return this.saveService;
     }
 
     public BuffManager getBuffManager(){
@@ -47,6 +52,10 @@ public abstract class EQCharacter implements Runnable {
 
     public Status getStatus() {
         return this.status;
+    }
+
+    public MovementManager getMovementManager() {
+        return movementManager;
     }
 
     public int getActionQueueDepth() {
@@ -65,13 +74,11 @@ public abstract class EQCharacter implements Runnable {
         this.characterRunning = characterRunning;
     }
 
-    public void submitCommand(Command request) {
-        currentActionDescription = "Submitting Command";
+    public void enqueCommand(Command request) {
         this.actionQueue.add(request);
     }
 
     public String queryForInfo(String query) {
-        currentActionDescription = "Querying for info";
         String answer = "";
         final CharacterInfoQuery pending = characterManager.getAsync().submitAsyncQuery(this, query);
         try {
@@ -90,7 +97,6 @@ public abstract class EQCharacter implements Runnable {
                 case REST:
                     buffManager.checkForExpiredBuffs();
 //                    benchMark();
-                    System.out.println(name+ "   REST");
                     restStateAction();
                     break;
                 case COMBAT:
@@ -104,18 +110,15 @@ public abstract class EQCharacter implements Runnable {
     }
 
     private void processActionQueue() {
-        currentActionDescription = "processing action queue";
         while (actionQueue.size() > 0) {
-            System.out.printf("[%s]\tHave pending actions: %d\r\n", name, actionQueue.size());
             final Command req = actionQueue.removeFirst();
             if (req.getSTATE() == ANY || req.getSTATE() == status.getState()) {
-                System.out.println("["+name+"]\tExecuting " + req.getClass().getSimpleName());
+                System.out.println("["+name+"]\tExecuting " + req.getClass());
                 req.apply();
             }else{
                 System.out.println("states don't match, discarding stupid fucking action");
             }
         }
-        System.out.println("leaving action queue");
     }
 
     private void benchMark() {

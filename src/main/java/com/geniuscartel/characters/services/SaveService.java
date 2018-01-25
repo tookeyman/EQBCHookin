@@ -7,6 +7,7 @@ import com.geniuscartel.workers.ioworkers.EQCharacterInterface;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
@@ -54,6 +55,10 @@ public class SaveService {
             return getServer();
         }
         return server;
+    }
+
+    public HashMap<String, String> getSpellConfig(EQCharacter c, String key){
+        return null;
     }
 
     public List<String> readBuffFile(EQCharacter c, String key){
