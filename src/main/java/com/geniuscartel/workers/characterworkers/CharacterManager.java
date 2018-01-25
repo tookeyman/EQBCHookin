@@ -76,6 +76,7 @@ public class CharacterManager {
     public EQCharacterInterface getAsync() {
         return async;
     }
+
     public void submitRequest(String request) {
         Matcher managerRequest = Pattern.compile("^\\[\\w+] MANAGER: (.*)$").matcher(request);
         if(managerRequest.find()){
