@@ -27,7 +27,7 @@ public class Shaman extends EQCharacter {
         synchronized (this) {
             try {
                 final EQCharacter driver = super.getCharacterManager().getCharacterByName("Zomgharmtouch");
-                super.getMovementManager().issueMovementCommand(driver.getStatus().getLoc());
+                getMovementManager().issueMovementCommand(driver.getStatus().getLoc());
                 this.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();

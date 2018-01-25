@@ -68,9 +68,7 @@ public class BuffManager {
                 try {
                     me.getCharacterManager().requestBuff(me, x.getKey());
                 } catch (Error e) {
-                    if (App.verbose) {
-                        System.out.println(e.getMessage());
-                    }
+                    App.debug(e.getMessage());
                 }
             });
     }

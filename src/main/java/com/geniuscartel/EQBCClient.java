@@ -28,6 +28,14 @@ public class EQBCClient {
     private final static ExecutorService IO_THREADS = Executors.newCachedThreadPool();
     private CharacterManager characters;
 
+
+    /*todo method/mechanism to stop everything gracefully
+
+
+     */
+
+
+
     public EQBCClient() {
         try {
             this.s = new Socket("localhost", 2112);
@@ -48,11 +56,10 @@ public class EQBCClient {
 
         IO_THREADS.execute(outputWorker);
         IO_THREADS.execute(requestWorker);
-        IO_THREADS.execute(()->characters.initializeSaveService());
+        IO_THREADS.execute(() -> characters.initializeSaveService());
     }
 
     public void shutDownWorkers(){
-        //todo createBuffCommand a mechanism for shutting down the orchestrator from a character
         outputWorker.setRunning(false);
         requestWorker.setRunning(false);
         outputWorker.notifyQue();

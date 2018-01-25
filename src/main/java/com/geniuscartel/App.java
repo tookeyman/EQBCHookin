@@ -3,7 +3,7 @@ package com.geniuscartel;
 import java.util.List;
 
 public class App {
-    public static boolean verbose = false;
+    public final static boolean verbose = false;
     public final static String Folder_Location = "D:\\MQ2\\Orchestrator";
     public static List<String> ActiveCharacters = null;
 
@@ -22,7 +22,5 @@ public class App {
         ActiveCharacters = list;
     }
 
-    public static void debug(Object bug){
-        System.out.printf("[DEBUG]\t%s\r\n", bug);
-    }
+    public static void debug(Object bug){ if (verbose) System.out.printf("[DEBUG]\t%s\r\n", bug); }
 }

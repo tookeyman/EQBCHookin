@@ -56,7 +56,8 @@ public class RequestWorker extends DequeWorker {
         if(isCharacterManagerRequest(request)){
             characters.submitRequest(request);
         }
-        if (App.verbose) System.out.printf("[REQUEST]%s\r\n", request);
+
+        App.debug(String.format("[REQUEST]%s\r\n", request));
     }
 
     public List<String> getClientNames() {

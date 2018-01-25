@@ -42,6 +42,10 @@ public abstract class EQCharacter implements Runnable {
         return this.characterManager;
     }
 
+    protected SaveService getSaveService(){
+        return this.saveService;
+    }
+
     public BuffManager getBuffManager(){
         return this.buffManager;
     }

@@ -23,7 +23,7 @@ public class CharacterManager {
     private final HashMap<String, EQCharacter> characters;
     private ExecutorService IOThreads;
     private EQCharacterInterface async;
-    private BuffService buffs = null;
+    private BuffService buffs;
     private boolean creationFlush = false;
     private EventQue creationEvent = new EventQue();
 

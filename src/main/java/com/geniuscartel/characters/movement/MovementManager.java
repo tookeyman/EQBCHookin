@@ -22,4 +22,8 @@ public class MovementManager {
         ME.enqueCommand(move);
         ME.notify();
     }
+
+    public void issueStickCommand(int id){
+
+    }
 }
