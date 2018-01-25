@@ -138,7 +138,7 @@ public class SaveService {
 
     private <T> T linesOf(Reader input,
                           Function<Stream<String>, T> handler,
-                          Function<IOException, RuntimeException> error){
+                          Function<IOException, RuntimeException> error) {
         try (BufferedReader reader = new BufferedReader(input)) {
             return handler.apply(reader.lines());
         } catch (IOException e) {
@@ -154,10 +154,7 @@ public class SaveService {
     public List<String> getMyNeededBuffs(EQCharacter c){
         return readBuffFile(c, "neededBuffs");
     }
-
     public List<String> getAvailableBuffs(EQCharacter c) {
         return readBuffFile(c, "AvailableBuffs");
     }
 }
-
-
