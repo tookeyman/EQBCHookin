@@ -4,7 +4,7 @@ import java.util.List;
 
 public class App {
     public final static boolean verbose = false;
-    public final static String Folder_Location = "D:\\MQ2\\Orchestrator";
+    public final static String Folder_Location = "K:\\everquest\\Orchestrator";
     public static List<String> ActiveCharacters = null;
 
     public static void main( String[] args ) throws InterruptedException {
