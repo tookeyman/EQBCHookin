@@ -9,7 +9,7 @@ public class ActionManager {
         this.ME = me;
     }
 
-    public void cast(String spellID) {
+    public void cast(String spellID) {//sends a command to the character to cast a spell... real basic
         final CommandFactory.MultiStageCommand casting = createCastCommand(String.format("//casting \"%s\"", spellID));
         ME.enqueCommand(casting);
     }
@@ -20,11 +20,13 @@ public class ActionManager {
     }
 
     private CommandFactory.MultiStageCommand createCastCommand(String commandString){
+        //creates a short macro to cast a spell
         final CommandFactory.MultiStageCommand macro = CommandFactory.createMultiStageCommand(CharacterState.ANY);
         final Command slashCommand = CommandFactory.createSimpleCommand(() -> ME.rawSlashCommand(commandString));
         macro.addCommand(slashCommand);
         macro.addCommand(waitForCasting);
         macro.addCommand(waitForCastingFinished);
+        //todo rewrite to support mq2cast and check for result success
         return macro;
     }
 
