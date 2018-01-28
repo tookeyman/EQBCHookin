@@ -9,7 +9,7 @@ public class App {
     //set verbose to true for crazy, per-packet logging
     public final static boolean verbose = false;
     //base directory for where to put files, stuff like that
-    public final static String Folder_Location = "D:\\MQ2\\Orchestrator";
+    public final static String Folder_Location = "K:\\everquest\\Orchestrator";
     //list of currently connected characters' names... we need this for random bootstrapping info
     public static List<String> ActiveCharacters = null;
 

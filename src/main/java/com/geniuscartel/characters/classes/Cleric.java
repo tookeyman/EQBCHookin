@@ -20,6 +20,17 @@ public class Cleric extends EQCharacter implements Healer, ManaUser{
     public void restStateAction() {
         synchronized (this) {
             try {
+                //int clrevo = Integer.parseInt(queryForInfo("${Me.Skill[Evocation]}"));
+                //if (clrevo <= 300){
+                    //rawSlashCommand("/casting 0014 -targetid|9");
+                //}
+                String harmonyofspirit = queryForInfo("${Me.Buff[Harmony of Spirit III].Duration}");
+                if (harmonyofspirit.equals("NULL")){
+                    rawSlashCommand("/casting 9073");
+                }
+                if ((getStatus().getCasting() == -1) && queryForInfo("${NetBots[Nekclr].Sitting}").equals("FALSE") && queryForInfo("${Stick.Status}").equals("OFF")){
+                    rawSlashCommand("/sit");}
+
                 this.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -42,6 +53,8 @@ public class Cleric extends EQCharacter implements Healer, ManaUser{
     public void combatStateAction() {
         synchronized (this) {
             try {
+                String tankhot = queryForInfo("${Neksk.Buff[Pious Elixir].Duration");
+                if (tankhot.equals("NULL")){rawSlashCommand("/casting 5259");}
                 this.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();

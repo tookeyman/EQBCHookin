@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Status {
-    private int casting = 0, id = -1;
+    private int casting = 0, id = -1, sitState = 0;
     private int hp = 0, mana = 0, end = 0, hpmax = 0, endmax = 0, manamax = 0, level = 0, xp = 0;
     private Location loc;
     private CharacterState state = CharacterState.REST;
-    private List<Integer> buffs = null;
+    private List<Integer> buffs = null, buffDuration = null;
     private final EQCharacter me;
 
     public Status(EQCharacter me) {
@@ -19,6 +19,10 @@ public class Status {
 
     public int getCasting() {
         return casting;
+    }
+
+    public int getSitState() {
+        return sitState;
     }
 
     public void setCasting(int casting) {
@@ -61,8 +65,24 @@ public class Status {
             buffs = new ArrayList<>();
         } else {
             buffs = Arrays.stream(couplet[1].split(":"))
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList());
+        }
+    }
+
+    private void updateSitState(String update) {
+        final String[] couplet = update.split("=");
+        sitState = Integer.parseInt(couplet[1]);
+    }
+
+    private void updateBuffDuration(String update) {
+        final String[] couplet = update.split("=");
+        if (couplet.length == 1) {
+            buffDuration = new ArrayList<>();
+        } else {
+            buffDuration = Arrays.stream(couplet[1].split(":"))
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList());
         }
     }
 
@@ -87,6 +107,20 @@ public class Status {
             }
         }
         return buffs;
+    }
+
+    public List<Integer> getBuffDuration() {
+        if(buffDuration == null){
+            synchronized (this){
+                try {
+                    wait(100);
+                    return getBuffDuration();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return buffDuration;
     }
 
     public double pctHp(){
@@ -202,7 +236,7 @@ public class Status {
 
                 break;
             case "Y":
-
+                updateSitState(param);
                 break;
             case "T":
 
@@ -211,7 +245,7 @@ public class Status {
                 parseZoneParam(param);
                 break;
             case "D":
-
+                updateBuffDuration(param);
                 break;
             case "@":
                 setLocation(param);
