@@ -7,7 +7,7 @@ import java.util.List;
 
 public class App {
     //set verbose to true for crazy, per-packet logging
-    public final static boolean verbose = false;
+    public final static boolean verbose = true ;
     //base directory for where to put files, stuff like that
     public final static String Folder_Location = "K:\\everquest\\Orchestrator";
     //list of currently connected characters' names... we need this for random bootstrapping info

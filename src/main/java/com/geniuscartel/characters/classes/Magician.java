@@ -15,15 +15,15 @@ public class Magician extends EQCharacter {
     public void restStateAction() {
         synchronized (this) {
             try {
-                String petID = queryForInfo("${Me.Pet.ID}");
-                String petBuff = queryForInfo("${Me.PetBuff[3237]}");
+                /*String petID = queryForInfo("${Me.Pet.ID}");
+                String petBuff = queryForInfo("${Me.PetBuff[Burnout V]}");
                 int petGeared = 0;
                 if (petID.equals("NULL")){
                     rawSlashCommand("/casting 3540");
                 }
                 if (petBuff.equals("NULL")){
                     rawSlashCommand("/casting 3237");
-                }
+                }*/
 
                 this.wait();
             } catch (InterruptedException e) {

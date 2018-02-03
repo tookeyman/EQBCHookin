@@ -28,6 +28,7 @@ public class Cleric extends EQCharacter implements Healer, ManaUser{
                 if (harmonyofspirit.equals("NULL")){
                     rawSlashCommand("/casting 9073");
                 }
+
                 if ((getStatus().getCasting() == -1) && queryForInfo("${NetBots[Nekclr].Sitting}").equals("FALSE") && queryForInfo("${Stick.Status}").equals("OFF")){
                     rawSlashCommand("/sit");}
 
@@ -53,8 +54,21 @@ public class Cleric extends EQCharacter implements Healer, ManaUser{
     public void combatStateAction() {
         synchronized (this) {
             try {
-                String tankhot = queryForInfo("${Neksk.Buff[Pious Elixir].Duration");
-                if (tankhot.equals("NULL")){rawSlashCommand("/casting 5259");}
+
+                String harmonyofspirit = queryForInfo("${Me.Buff[Harmony of Spirit III].Duration}");
+                if (harmonyofspirit.equals("NULL")){
+                    rawSlashCommand("/casting 9073");
+                }
+
+                String tankhot = queryForInfo("${NetBots[Neksk].Buff}");
+                String tankID = queryForInfo("${NetBots[Neksk].ID}");
+                if (!tankhot.contains("5259")){
+                    rawSlashCommand("/casting 5259 -targetid|${NetBots[Neksk].ID}");
+                }
+
+                if ((getStatus().getCasting() == -1) && queryForInfo("${NetBots[Nekclr].Sitting}").equals("FALSE") && queryForInfo("${Stick.Status}").equals("OFF")){
+                    rawSlashCommand("/sit");}
+
                 this.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();

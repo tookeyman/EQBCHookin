@@ -19,9 +19,9 @@ public class ShadowKnight extends EQCharacter {
     public void restStateAction() {
         synchronized (this) {
             try {
-                System.out.println(getStatus().getSitState());
-                System.out.println(Integer.toBinaryString(getStatus().getSitState()));
-                System.out.println(getStatus().getBuffDuration());
+                //System.out.println(getStatus().getSitState());
+                //System.out.println(Integer.toBinaryString(getStatus().getSitState()));
+                //System.out.println(getStatus().getBuffDuration());
                 this.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
